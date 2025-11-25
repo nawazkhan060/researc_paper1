@@ -1,5 +1,7 @@
 // Mock data for the research paper review platform
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:4000';
+
 export const mockUsers = [
   {
     id: 1,
@@ -125,104 +127,486 @@ export const mockNotifications = [
   }
 ];
 
-// Mock API functions
+// Mock API functions (now backed by the real backend)
 export const mockAPI = {
   // Authentication
   login: async (email, password) => {
-    const user = mockUsers.find(u => u.email === email && u.password === password);
-    if (user) {
-      return { success: true, user: { ...user, password: undefined } };
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await response.json();
+
+      if (!data.success || !data.user) {
+        return { success: false, error: data.error || 'Invalid credentials' };
+      }
+
+      return { success: true, user: data.user };
+    } catch (error) {
+      console.error('login error', error);
+      return { success: false, error: 'Login failed. Please try again.' };
     }
-    return { success: false, error: 'Invalid credentials' };
   },
 
   register: async (userData) => {
-    const newUser = {
-      id: mockUsers.length + 1,
-      ...userData,
-      role: 'author'
-    };
-    mockUsers.push(newUser);
-    return { success: true, user: { ...newUser, password: undefined } };
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData)
+      });
+      const data = await response.json();
+
+      if (!data.success || !data.user) {
+        return { success: false, error: data.error || 'Registration failed. Please try again.' };
+      }
+
+      return { success: true, user: data.user };
+    } catch (error) {
+      console.error('register error', error);
+      return { success: false, error: 'Registration failed. Please try again.' };
+    }
   },
 
   // Papers
   getPublishedPapers: async () => {
-    return mockPapers.filter(paper => paper.status === 'published');
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/papers/published`);
+      const data = await response.json();
+
+      if (!data.success || !Array.isArray(data.papers)) {
+        return [];
+      }
+
+      return data.papers;
+    } catch (error) {
+      console.error('getPublishedPapers error', error);
+      return [];
+    }
+  },
+
+  getIssueAssignments: async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/issues/assignments`);
+      const data = await response.json();
+
+      if (!data.success || !Array.isArray(data.assignments)) {
+        return [];
+      }
+
+      return data.assignments;
+    } catch (error) {
+      console.error('getIssueAssignments error', error);
+      return [];
+    }
   },
 
   getAllPapers: async () => {
-    return mockPapers;
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/papers`);
+      const data = await response.json();
+
+      if (!data.success || !Array.isArray(data.papers)) {
+        return [];
+      }
+
+      return data.papers;
+    } catch (error) {
+      console.error('getAllPapers error', error);
+      return [];
+    }
   },
 
   getPaperById: async (id) => {
-    return mockPapers.find(paper => paper.id === parseInt(id));
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/papers/${id}`);
+      const data = await response.json();
+
+      if (!data.success) {
+        return null;
+      }
+
+      return data.paper || null;
+    } catch (error) {
+      console.error('getPaperById error', error);
+      return null;
+    }
   },
 
   submitPaper: async (paperData) => {
-    const newPaper = {
-      id: mockPapers.length + 1,
-      ...paperData,
-      status: 'submitted',
-      submissionDate: new Date().toISOString().split('T')[0]
-    };
-    mockPapers.push(newPaper);
-    return { success: true, paper: newPaper };
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/papers`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(paperData)
+      });
+      const data = await response.json();
+
+      if (!data.success || !data.paper) {
+        return { success: false, error: data.error || 'Failed to submit paper.' };
+      }
+
+      return { success: true, paper: data.paper };
+    } catch (error) {
+      console.error('submitPaper error', error);
+      return { success: false, error: 'Failed to submit paper.' };
+    }
+  },
+
+  uploadRevision: async (paperId, userId, file) => {
+    try {
+      const formData = new FormData();
+      formData.append('manuscript', file);
+      if (userId) {
+        formData.append('userId', String(userId));
+      }
+
+      const response = await fetch(`${API_BASE_URL}/api/submissions/${paperId}/revision`, {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        return { success: false, error: data.error || 'Failed to upload revised manuscript.' };
+      }
+
+      return { success: true, manuscriptUrl: data.manuscriptUrl };
+    } catch (error) {
+      console.error('uploadRevision error', error);
+      return { success: false, error: 'Failed to upload revised manuscript.' };
+    }
   },
 
   // Reviews
   getReviewsByReviewer: async (reviewerId) => {
-    return mockReviews.filter(review => review.reviewerId === reviewerId);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/reviews/reviewer/${reviewerId}`);
+      const data = await response.json();
+
+      if (!data.success || !Array.isArray(data.reviews)) {
+        return [];
+      }
+
+      return data.reviews;
+    } catch (error) {
+      console.error('getReviewsByReviewer error', error);
+      return [];
+    }
   },
 
   getReviewsByPaper: async (paperId) => {
-    return mockReviews.filter(review => review.paperId === paperId);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/reviews/paper/${paperId}`);
+      const data = await response.json();
+
+      if (!data.success || !Array.isArray(data.reviews)) {
+        return [];
+      }
+
+      return data.reviews;
+    } catch (error) {
+      console.error('getReviewsByPaper error', error);
+      return [];
+    }
   },
 
   submitReview: async (reviewData) => {
-    const newReview = {
-      id: mockReviews.length + 1,
-      ...reviewData,
-      submittedDate: new Date().toISOString().split('T')[0],
-      status: 'completed'
-    };
-    mockReviews.push(newReview);
-    return { success: true, review: newReview };
-  },
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/reviews`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(reviewData),
+      });
 
-  // Admin functions
-  assignReviewer: async (paperId, reviewerId) => {
-    const paper = mockPapers.find(p => p.id === paperId);
-    if (paper) {
-      if (!paper.assignedReviewers) paper.assignedReviewers = [];
-      paper.assignedReviewers.push(reviewerId);
-      return { success: true };
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        return { success: false, error: data.error || 'Failed to submit review.' };
+      }
+
+      return { success: true, review: data.review };
+    } catch (error) {
+      console.error('submitReview error', error);
+      return { success: false, error: 'Failed to submit review.' };
     }
-    return { success: false, error: 'Paper not found' };
   },
 
-  publishPaper: async (paperId) => {
-    const paper = mockPapers.find(p => p.id === paperId);
-    if (paper) {
-      paper.status = 'published';
-      paper.publicationDate = new Date().toISOString().split('T')[0];
-      paper.doi = `10.1000/example.2024.${paperId.toString().padStart(3, '0')}`;
-      return { success: true };
+  getIssues: async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/issues`);
+      const data = await response.json();
+
+      if (!data.success || !Array.isArray(data.issues)) {
+        return [];
+      }
+
+      return data.issues;
+    } catch (error) {
+      console.error('getIssues error', error);
+      return [];
     }
-    return { success: false, error: 'Paper not found' };
   },
 
-  // Notifications
-  getNotifications: async (userId) => {
-    return mockNotifications.filter(notif => notif.userId === userId);
+  getIssuePapers: async (issueId) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/issues/${issueId}/papers`);
+      const data = await response.json();
+
+      if (!data.success || !Array.isArray(data.papers)) {
+        return [];
+      }
+
+      return data.papers;
+    } catch (error) {
+      console.error('getIssuePapers error', error);
+      return [];
+    }
   },
+
+  createIssue: async (issueData) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/issues`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(issueData),
+      });
+      const data = await response.json();
+
+      if (!data.success || !data.issue) {
+        return { success: false, error: data.error || 'Failed to create issue.' };
+      }
+
+      return { success: true, issue: data.issue };
+    } catch (error) {
+      console.error('createIssue error', error);
+      return { success: false, error: 'Failed to create issue.' };
+    }
+  },
+
+setCurrentIssue: async (issueId) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/issues/${issueId}/set-current`, {
+      method: 'POST',
+    });
+    const data = await response.json();
+
+    if (!data.success || !data.issue) {
+      return { success: false, error: data.error || 'Failed to update current issue.' };
+    }
+
+    return { success: true, issue: data.issue };
+  } catch (error) {
+    console.error('setCurrentIssue error', error);
+    return { success: false, error: 'Failed to update current issue.' };
+  }
+},
+
+deleteIssue: async (issueId) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/issues/${issueId}`, {
+      method: 'DELETE',
+    });
+    const data = await response.json();
+
+    if (!data.success) {
+      return { success: false, error: data.error || 'Failed to delete issue.' };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error('deleteIssue error', error);
+    return { success: false, error: 'Failed to delete issue.' };
+  }
+},
+
+assignPaperToIssue: async (paperId, issueId) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/issues/${issueId}/assign-paper`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ paperId }),
+    });
+    const data = await response.json();
+
+    if (!data.success) {
+      return { success: false, error: data.error || 'Failed to assign paper to issue.' };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error('assignPaperToIssue error', error);
+    return { success: false, error: 'Failed to assign paper to issue.' };
+  }
+},
+
+unassignPaperFromIssue: async (paperId, issueId) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/issues/${issueId}/assign-paper/${paperId}`, {
+      method: 'DELETE',
+    });
+    const data = await response.json();
+
+    if (!data.success) {
+      return { success: false, error: data.error || 'Failed to unassign paper from issue.' };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error('unassignPaperFromIssue error', error);
+    return { success: false, error: 'Failed to unassign paper from issue.' };
+  }
+},
+
+// Notifications
+getNotifications: async (userId) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/notifications?userId=${userId}`);
+    const data = await response.json();
+
+    if (!data.success || !Array.isArray(data.notifications)) {
+      return [];
+    }
+
+    return data.notifications;
+  } catch (error) {
+    console.error('getNotifications error', error);
+    return [];
+  }
+},
 
   markNotificationRead: async (notificationId) => {
-    const notification = mockNotifications.find(n => n.id === notificationId);
-    if (notification) {
-      notification.read = true;
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/notifications/${notificationId}/read`, {
+        method: 'POST'
+      });
+      const data = await response.json();
+
+      if (!data.success) {
+        return { success: false };
+      }
+
       return { success: true };
+    } catch (error) {
+      console.error('markNotificationRead error', error);
+      return { success: false };
     }
-    return { success: false };
+  },
+
+  deleteNotification: async (notificationId) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/notifications/${notificationId}`, {
+        method: 'DELETE',
+      });
+      const data = await response.json();
+
+      if (!data.success) {
+        return { success: false };
+      }
+
+      return { success: true };
+    } catch (error) {
+      console.error('deleteNotification error', error);
+      return { success: false };
+    }
+  }
+};
+
+// Admin helper methods attached after mockAPI definition
+mockAPI.getReviewers = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/admin/reviewers`);
+    const data = await response.json();
+
+    if (!data.success || !Array.isArray(data.reviewers)) {
+      return [];
+    }
+
+    return data.reviewers;
+  } catch (error) {
+    console.error('getReviewers error', error);
+    return [];
+  }
+};
+
+mockAPI.assignReviewer = async (paperId, reviewerId) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/admin/assign-reviewer`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ paperId, reviewerId })
+    });
+    const data = await response.json();
+
+    if (!data.success) {
+      return { success: false, error: data.error || 'Failed to assign reviewer.' };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error('assignReviewer error', error);
+    return { success: false, error: 'Failed to assign reviewer.' };
+  }
+};
+
+mockAPI.publishPaper = async (paperId) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/admin/publish-paper`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ paperId })
+    });
+    const data = await response.json();
+
+    if (!data.success) {
+      return { success: false, error: data.error || 'Failed to publish paper.' };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error('publishPaper error', error);
+    return { success: false, error: 'Failed to publish paper.' };
+  }
+};
+
+mockAPI.requestRevisions = async (paperId, note) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/admin/request-revisions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ paperId, note }),
+    });
+    const data = await response.json();
+
+    if (!data.success) {
+      return { success: false, error: data.error || 'Failed to request revisions.' };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error('requestRevisions error', error);
+    return { success: false, error: 'Failed to request revisions.' };
+  }
+};
+
+mockAPI.rejectPaper = async (paperId, note) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/admin/reject-paper`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ paperId, note }),
+    });
+    const data = await response.json();
+
+    if (!data.success) {
+      return { success: false, error: data.error || 'Failed to reject paper.' };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error('rejectPaper error', error);
+    return { success: false, error: 'Failed to reject paper.' };
   }
 };

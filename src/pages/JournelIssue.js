@@ -1,32 +1,62 @@
 import React, { useState, useEffect } from 'react';
 import Footer from '../components/Footer';
+import { mockAPI } from '../data/mockData';
 
 const JournalIssues = () => {
   // Mock data simulation - replace with real data from your API/backend
   const [issues, setIssues] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentIssuePapers, setCurrentIssuePapers] = useState([]);
+  const [papersLoading, setPapersLoading] = useState(false);
+  const [expandedIssueId, setExpandedIssueId] = useState(null);
+  const [archiveIssuePapers, setArchiveIssuePapers] = useState({});
+  const [archivePapersLoadingId, setArchivePapersLoadingId] = useState(null);
 
   useEffect(() => {
-    // In a real app, you would fetch this from your backend.
-    const fetchIssues = () => {
-      const mockIssues = [
-        { id: 1, volume: 3, issue: 4, month: 'December', year: 2025, isCurrent: true },
-        { id: 2, volume: 3, issue: 3, year: 2024, isCurrent: false },
-        { id: 3, volume: 3, issue: 2, year: 2024, isCurrent: false },
-        { id: 4, volume: 3, issue: 1, year: 2024, isCurrent: false },
-        { id: 5, volume: 2, issue: 12, year: 2023, isCurrent: false },
-        { id: 6, volume: 2, issue: 11, year: 2023, isCurrent: false },
-        { id: 7, volume: 2, issue: 10, year: 2023, isCurrent: false },
-      ].sort((a, b) => b.year - a.year || b.issue - a.issue);
-      setIssues(mockIssues);
-      setLoading(false);
+    const loadIssues = async () => {
+      try {
+        const data = await mockAPI.getIssues();
+        const sorted = (data || []).slice().sort((a, b) => b.year - a.year || b.issue - a.issue);
+        setIssues(sorted);
+      } catch (error) {
+        console.error('Error loading issues:', error);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    fetchIssues();
+    loadIssues();
   }, []);
 
   const currentIssue = issues.find(issue => issue.isCurrent);
   const archives = issues.filter(issue => !issue.isCurrent);
+
+  useEffect(() => {
+    const loadCurrentIssuePapers = async () => {
+      const issue = issues.find((i) => i.isCurrent);
+      if (!issue) {
+        setCurrentIssuePapers([]);
+        return;
+      }
+
+      try {
+        setPapersLoading(true);
+        const papers = await mockAPI.getIssuePapers(issue.id);
+        setCurrentIssuePapers(papers || []);
+      } catch (error) {
+        console.error('Error loading current issue papers:', error);
+        setCurrentIssuePapers([]);
+      } finally {
+        setPapersLoading(false);
+      }
+    };
+
+    if (issues && issues.length > 0) {
+      loadCurrentIssuePapers();
+    } else {
+      setCurrentIssuePapers([]);
+    }
+  }, [issues]);
 
   // Group archives by volume
   const archivesByVolume = archives.reduce((acc, issue) => {
@@ -38,19 +68,55 @@ const JournalIssues = () => {
     return acc;
   }, {});
 
-  // Mock paper data for the current issue (only one paper shown)
-  const currentIssuePaper = {
-    id: 1,
-    title: "Advanced Machine Learning Techniques for Natural Language Processing",
-    authors: ["Dr. Sarah Johnson", "Dr. Alex Thompson"],
-    category: "Computer Science",
-    doi: "10.1000/example.2024.001",
-    abstract: "This paper presents novel approaches to improving natural language processing through advanced machine learning techniques...",
-    keywords: ["Machine Learning", "NLP", "Deep Learning", "Text Processing"],
-    submittedDate: "1/15/2024",
-    publishedDate: "3/20/2024",
-    citations: 12,
-    status: "Published"
+  const mapBackendPaperToIssueCard = (paper) => ({
+    id: paper.id,
+    title: paper.title,
+    authors: paper.authors || [],
+    category: paper.category || 'N/A',
+    doi: paper.doi || 'N/A',
+    abstract: paper.abstract || '',
+    keywords: paper.keywords || [],
+    submittedDate: paper.submissionDate
+      ? new Date(paper.submissionDate).toLocaleDateString()
+      : 'N/A',
+    publishedDate: paper.publicationDate
+      ? new Date(paper.publicationDate).toLocaleDateString()
+      : 'N/A',
+    citations: paper.citationCount || 0,
+    status: (paper.status || 'Published').replace('_', ' ').toUpperCase(),
+    pdfUrl: paper.pdfUrl || null,
+  });
+
+  const handleArchiveIssueClick = async (issue) => {
+    if (!issue) return;
+
+    if (expandedIssueId === issue.id) {
+      setExpandedIssueId(null);
+      return;
+    }
+
+    setExpandedIssueId(issue.id);
+
+    if (archiveIssuePapers[issue.id]) {
+      return;
+    }
+
+    try {
+      setArchivePapersLoadingId(issue.id);
+      const papers = await mockAPI.getIssuePapers(issue.id);
+      setArchiveIssuePapers((prev) => ({
+        ...prev,
+        [issue.id]: papers || [],
+      }));
+    } catch (error) {
+      console.error('Error loading archive issue papers:', error);
+      setArchiveIssuePapers((prev) => ({
+        ...prev,
+        [issue.id]: [],
+      }));
+    } finally {
+      setArchivePapersLoadingId(null);
+    }
   };
 
   // Render individual paper card (for current issue only)
@@ -100,7 +166,9 @@ const JournalIssues = () => {
         </div>
 
         <a
-          href={`/paper/${paper.id}`}
+          href={paper.pdfUrl || '#'}
+          target="_blank"
+          rel="noopener noreferrer"
           className="w-full inline-flex items-center justify-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors duration-200"
         >
           View Full Paper
@@ -158,12 +226,22 @@ const JournalIssues = () => {
                   <h3 className="text-2xl font-bold text-slate-900 mb-2">
                     Volume {currentIssue.volume}, Issue {currentIssue.issue} – {currentIssue.month}, {currentIssue.year}
                   </h3>
-                  <p className="text-slate-600">Featured paper from this issue.</p>
+                  <p className="text-slate-600">Articles published in this issue.</p>
                 </div>
 
-                <div className="flex justify-center">
-                  <PaperCard paper={currentIssuePaper} />
-                </div>
+                {papersLoading ? (
+                  <div className="text-center text-slate-500">Loading papers for this issue...</div>
+                ) : currentIssuePapers.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {currentIssuePapers.map((paper) => (
+                      <PaperCard key={paper.id} paper={mapBackendPaperToIssueCard(paper)} />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-8 text-center">
+                    <p className="text-slate-600">No papers have been assigned to this issue yet.</p>
+                  </div>
+                )}
               </>
             ) : (
               <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-8 text-center">
@@ -198,20 +276,44 @@ const JournalIssues = () => {
                       {issuesInVolume.map((issue) => (
                         <div
                           key={issue.id}
-                          className="bg-white rounded-2xl p-6 shadow-lg border border-slate-200 hover:shadow-xl transition-all duration-300"
+                          className="bg-white rounded-2xl p-6 shadow-lg border border-slate-200 hover:shadow-xl transition-all duration-300 cursor-pointer"
+                          onClick={() => handleArchiveIssueClick(issue)}
                         >
-                          <h4 className="text-lg font-bold text-slate-900 mb-3">
-                            Issue {issue.issue}, {issue.year}
+                          <h4 className="text-lg font-bold text-slate-900 mb-3 flex items-center justify-between">
+                            <span>
+                              Issue {issue.issue}, {issue.year}
+                            </span>
+                            <span className="text-xs text-indigo-600">
+                              {expandedIssueId === issue.id ? 'Hide Articles' : 'View Articles'}
+                            </span>
                           </h4>
-                          <a
-                            href={`/papers?volume=${issue.volume}&issue=${issue.issue}`}
-                            className="inline-flex items-center text-indigo-600 hover:text-indigo-800 font-medium"
-                          >
-                            View Articles
-                            <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                            </svg>
-                          </a>
+
+                          {expandedIssueId === issue.id && (
+                            <div className="mt-4 border-t border-slate-200 pt-4 space-y-3">
+                              {archivePapersLoadingId === issue.id ? (
+                                <p className="text-sm text-slate-500">Loading papers for this issue...</p>
+                              ) : (archiveIssuePapers[issue.id] || []).length === 0 ? (
+                                <p className="text-sm text-slate-500">No papers have been assigned to this issue yet.</p>
+                              ) : (
+                                (archiveIssuePapers[issue.id] || []).map((paper) => (
+                                  <div key={paper.id} className="text-sm">
+                                    <a
+                                      href={paper.pdfUrl || '#'}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="font-semibold text-indigo-700 hover:text-indigo-900 hover:underline"
+                                    >
+                                      {paper.title}
+                                    </a>
+
+                                    <p className="text-slate-600 text-xs mt-1">
+                                      {Array.isArray(paper.authors) ? paper.authors.join(', ') : paper.authors}
+                                    </p>
+                                  </div>
+                                ))
+                              )}
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>

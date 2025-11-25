@@ -230,32 +230,7 @@ const Landing = () => {
       </section>
 
       {/* Important Dates Section */}
-      <section className="bg-slate-100 py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl font-bold text-slate-900 mb-6">
-              Important <span className="text-indigo-600">Dates</span>
-            </h2>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-              Stay updated with our key deadlines and publication schedule.
-            </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              { label: 'Submission Deadline', date: '20/12/2024', description: 'Final day for manuscript submissions for the upcoming issue.' },
-              { label: 'Acceptance Notification', date: 'January 2025', description: 'Authors will be notified of the review outcome.' },
-              { label: 'Final Paper Due', date: 'February 2025', description: 'Final camera-ready papers are due for accepted manuscripts.' },
-              { label: 'Next Publication', date: 'December 2025', description: 'The next issue of IJEPA will be published online.' }
-            ].map((item, index) => (
-              <div key={index} className="bg-white p-6 rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-t-4 border-indigo-500">
-                <h3 className="text-indigo-600 font-bold text-2xl mb-2">{item.date}</h3>
-                <p className="text-slate-800 font-semibold text-lg mb-3">{item.label}</p>
-                <p className="text-slate-600 text-sm">{item.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      
 
       {/* Search and Filter Section */}
       

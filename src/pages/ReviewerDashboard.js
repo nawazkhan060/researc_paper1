@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import PaperCard from '../components/PaperCard';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -7,6 +8,8 @@ import { mockAPI } from '../data/mockData';
 
 const ReviewerDashboard = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
+
   const [activeTab, setActiveTab] = useState('assigned');
   const [assignedPapers, setAssignedPapers] = useState([]);
   const [completedReviews, setCompletedReviews] = useState([]);
@@ -20,6 +23,10 @@ const ReviewerDashboard = () => {
   });
   const [submittingReview, setSubmittingReview] = useState(false);
   const [alert, setAlert] = useState(null);
+  const [reviewerNotifications, setReviewerNotifications] = useState([]);
+  const [reviewerSearchTerm, setReviewerSearchTerm] = useState('');
+  const [reviewerSortBy, setReviewerSortBy] = useState('recent');
+  const [showAllReviewerPapers, setShowAllReviewerPapers] = useState(false);
 
   useEffect(() => {
     loadReviewerData();
@@ -39,6 +46,10 @@ const ReviewerDashboard = () => {
       // Get completed reviews
       const reviews = await mockAPI.getReviewsByReviewer(user.id);
       setCompletedReviews(reviews);
+
+      // Get reviewer notifications so we can detect revised manuscripts per paper
+      const notifResult = await mockAPI.getNotifications(user.id);
+      setReviewerNotifications(Array.isArray(notifResult) ? notifResult : []);
     } catch (error) {
       console.error('Error loading reviewer data:', error);
     } finally {
@@ -51,16 +62,16 @@ const ReviewerDashboard = () => {
     setReviewFormData({
       rating: '',
       recommendation: '',
-      comments: ''
+      comments: '',
     });
     setShowReviewForm(true);
   };
 
   const handleReviewFormChange = (e) => {
-    setReviewFormData({
-      ...reviewFormData,
-      [e.target.name]: e.target.value
-    });
+    setReviewFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
 
   const handleSubmitReview = async (e) => {
@@ -93,18 +104,99 @@ const ReviewerDashboard = () => {
     }
   };
 
+  const getRevisionRounds = (paper) => {
+    if (!paper || !paper.title || !Array.isArray(reviewerNotifications)) return 1;
+
+    const revisionNotifs = reviewerNotifications.filter((n) =>
+      n &&
+      n.title === 'Revised manuscript uploaded' &&
+      typeof n.message === 'string' &&
+      n.message.includes(paper.title)
+    );
+
+    return 1 + revisionNotifs.length;
+  };
+
   const getReviewStats = () => {
+    const pendingCount = assignedPapers.filter((paper) => {
+      const reviewsForPaper = completedReviews.filter((review) => review.paperId === paper.id);
+      const reviewCount = reviewsForPaper.length;
+      const totalRounds = getRevisionRounds(paper);
+      return reviewCount < totalRounds;
+    }).length;
+
     const stats = {
       assigned: assignedPapers.length,
       completed: completedReviews.length,
-      pending: assignedPapers.filter(paper => 
-        !completedReviews.some(review => review.paperId === paper.id)
-      ).length
+      pending: pendingCount,
     };
     return stats;
   };
 
   const stats = getReviewStats();
+
+  const reviewerSearch = reviewerSearchTerm.trim().toLowerCase();
+
+  const matchesReviewerSearch = (paper) => {
+    if (!reviewerSearch) return true;
+
+    const title = (paper.title || '').toLowerCase();
+    const abstract = (paper.abstract || '').toLowerCase();
+    const category = (paper.category || '').toLowerCase();
+    const authorsText = Array.isArray(paper.authors) ? paper.authors.join(' ').toLowerCase() : String(paper.authors || '').toLowerCase();
+
+    return (
+      title.includes(reviewerSearch) ||
+      abstract.includes(reviewerSearch) ||
+      category.includes(reviewerSearch) ||
+      authorsText.includes(reviewerSearch)
+    );
+  };
+
+  const assignedPapersWithMeta = (assignedPapers || []).map((paper) => {
+    const reviewsForPaper = completedReviews.filter((review) => review.paperId === paper.id);
+    const totalRounds = getRevisionRounds(paper);
+    const reviewCount = reviewsForPaper.length;
+    const isCompleted = reviewCount >= totalRounds;
+    const isRevisionRound = !isCompleted && totalRounds > 1;
+
+    return {
+      paper,
+      reviewsForPaper,
+      totalRounds,
+      reviewCount,
+      isCompleted,
+      isRevisionRound,
+    };
+  });
+
+  let visibleAssignedWithMeta = assignedPapersWithMeta.filter(({ paper }) => matchesReviewerSearch(paper));
+
+  if (!showAllReviewerPapers) {
+    visibleAssignedWithMeta = visibleAssignedWithMeta.filter((item) => !item.isCompleted);
+  }
+
+  visibleAssignedWithMeta = [...visibleAssignedWithMeta].sort((a, b) => {
+    const paperA = a.paper;
+    const paperB = b.paper;
+
+    if (reviewerSortBy === 'title_az') {
+      return (paperA.title || '').localeCompare(paperB.title || '');
+    }
+
+    if (reviewerSortBy === 'title_za') {
+      return (paperB.title || '').localeCompare(paperA.title || '');
+    }
+
+    const dateA = paperA.submissionDate ? new Date(paperA.submissionDate) : new Date(0);
+    const dateB = paperB.submissionDate ? new Date(paperB.submissionDate) : new Date(0);
+
+    if (reviewerSortBy === 'oldest') {
+      return dateA - dateB;
+    }
+
+    return dateB - dateA;
+  });
 
   if (loading) {
     return (
@@ -213,95 +305,139 @@ const ReviewerDashboard = () => {
 
         {/* Assigned Papers */}
         {activeTab === 'assigned' && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {assignedPapers.map(paper => {
-              const isCompleted = completedReviews.some(review => review.paperId === paper.id);
-              const review = completedReviews.find(review => review.paperId === paper.id);
-              
-              return (
-                <div key={paper.id} className="bg-white rounded-xl shadow-sm border border-academic-200 p-6 hover:shadow-md transition-all duration-300">
-                  <div className="flex justify-between items-start mb-4">
-                    <h3 className="text-lg font-semibold text-academic-900 line-clamp-2 leading-tight">
-                      {paper.title}
-                    </h3>
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      isCompleted ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                    }`}>
-                      {isCompleted ? 'REVIEWED' : 'PENDING'}
-                    </span>
-                  </div>
+          <>
+            <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <input
+                type="text"
+                value={reviewerSearchTerm}
+                onChange={(e) => setReviewerSearchTerm(e.target.value)}
+                placeholder="Search by title, author, category..."
+                className="w-full md:max-w-md px-4 py-2 border border-academic-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
+              />
+              <div className="flex items-center gap-3">
+                <select
+                  value={reviewerSortBy}
+                  onChange={(e) => setReviewerSortBy(e.target.value)}
+                  className="px-3 py-2 border border-academic-200 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                >
+                  <option value="recent">Newest first</option>
+                  <option value="oldest">Oldest first</option>
+                  <option value="title_az">Title A-Z</option>
+                  <option value="title_za">Title Z-A</option>
+                </select>
+                <button
+                  type="button"
+                  onClick={() => setShowAllReviewerPapers((prev) => !prev)}
+                  className="px-3 py-2 border border-academic-200 rounded-lg bg-white text-sm font-medium text-academic-700 hover:bg-academic-50"
+                >
+                  {showAllReviewerPapers ? 'Show unfinished only' : 'View all papers'}
+                </button>
+              </div>
+            </div>
 
-                  <div className="mb-4 space-y-2">
-                    <div className="flex items-center">
-                      <span className="font-medium text-academic-700 text-sm w-20">Authors:</span>
-                      <span className="text-sm text-academic-600">{paper.authors.join(', ')}</span>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {visibleAssignedWithMeta.map(({ paper, reviewsForPaper, totalRounds, reviewCount, isCompleted, isRevisionRound }) => {
+                const review = reviewsForPaper[0] || null;
+
+                return (
+                  <div key={`${paper.id}-${totalRounds}`} className="bg-white rounded-xl shadow-sm border border-academic-200 p-6 hover:shadow-md transition-all duration-300">
+                    <div className="flex justify-between items-start mb-4">
+                      <h3 className="text-lg font-semibold text-academic-900 line-clamp-2 leading-tight">
+                        {paper.title}
+                      </h3>
+                      <span className={`${
+                        isCompleted
+                          ? 'badge-success'
+                          : isRevisionRound
+                            ? 'badge-info'
+                            : 'badge-warning'
+                      }`}>
+                        {isCompleted
+                          ? 'REVIEWED'
+                          : isRevisionRound
+                            ? 'REVISION PENDING'
+                            : 'PENDING'}
+                      </span>
                     </div>
-                    <div className="flex items-center">
-                      <span className="font-medium text-academic-700 text-sm w-20">Category:</span>
-                      <span className="text-sm text-academic-600">{paper.category}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <span className="font-medium text-academic-700 text-sm w-20">Submitted:</span>
-                      <span className="text-sm text-academic-600">{new Date(paper.submissionDate).toLocaleDateString()}</span>
-                    </div>
-                    {paper.reviewDeadline && (
+
+                    <div className="mb-4 space-y-2">
                       <div className="flex items-center">
-                        <span className="font-medium text-academic-700 text-sm w-20">Deadline:</span>
-                        <span className="text-sm text-academic-600">{new Date(paper.reviewDeadline).toLocaleDateString()}</span>
+                        <span className="font-medium text-academic-700 text-sm w-20">Authors:</span>
+                        <span className="text-sm text-academic-600">{paper.authors.join(', ')}</span>
+                      </div>
+                      <div className="flex items-center">
+                        <span className="font-medium text-academic-700 text-sm w-20">Category:</span>
+                        <span className="text-sm text-academic-600">{paper.category}</span>
+                      </div>
+                      <div className="flex items-center">
+                        <span className="font-medium text-academic-700 text-sm w-20">Submitted:</span>
+                        <span className="text-sm text-academic-600">{new Date(paper.submissionDate).toLocaleDateString()}</span>
+                      </div>
+                      {paper.reviewDeadline && (
+                        <div className="flex items-center">
+                          <span className="font-medium text-academic-700 text-sm w-20">Deadline:</span>
+                          <span className="text-sm text-academic-600">{new Date(paper.reviewDeadline).toLocaleDateString()}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="mb-5">
+                      <p className="text-academic-700 text-sm leading-relaxed line-clamp-3">
+                        {paper.abstract}
+                      </p>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2 mb-5">
+                      {paper.keywords.map((keyword, index) => (
+                        <span
+                          key={index}
+                          className="px-3 py-1 bg-academic-100 text-academic-700 text-xs rounded-full font-medium"
+                        >
+                          {keyword}
+                        </span>
+                      ))}
+                    </div>
+
+                    {isCompleted && review && (
+                      <div className="pt-4 border-t border-academic-200">
+                        <div className="flex justify-between items-center mb-3">
+                          <span className="text-sm font-medium text-academic-600">Your Review Summary</span>
+                          <span className="text-sm text-academic-500 font-medium">
+                            Rating: {review.rating}/5
+                          </span>
+                        </div>
+                        <p className="text-sm text-academic-600 mb-2">
+                          <span className="font-medium">Recommendation:</span> <span className="font-semibold capitalize">
+                            {review.recommendation.replace('_', ' ')}
+                          </span>
+                        </p>
+                        <p className="text-sm text-academic-700 line-clamp-2 bg-academic-50 p-3 rounded-md">
+                          {review.comments}
+                        </p>
                       </div>
                     )}
-                  </div>
 
-                  <div className="mb-5">
-                    <p className="text-academic-700 text-sm leading-relaxed line-clamp-3">
-                      {paper.abstract}
-                    </p>
-                  </div>
-
-                  <div className="flex flex-wrap gap-2 mb-5">
-                    {paper.keywords.map((keyword, index) => (
-                      <span
-                        key={index}
-                        className="px-3 py-1 bg-academic-100 text-academic-700 text-xs rounded-full font-medium"
-                      >
-                        {keyword}
-                      </span>
-                    ))}
-                  </div>
-
-                  {isCompleted && review && (
-                    <div className="pt-4 border-t border-academic-200">
-                      <div className="flex justify-between items-center mb-3">
-                        <span className="text-sm font-medium text-academic-600">Your Review Summary</span>
-                        <span className="text-sm text-academic-500 font-medium">
-                          Rating: {review.rating}/5
-                        </span>
-                      </div>
-                      <p className="text-sm text-academic-600 mb-2">
-                        <span className="font-medium">Recommendation:</span> <span className="font-semibold capitalize">
-                          {review.recommendation.replace('_', ' ')}
-                        </span>
-                      </p>
-                      <p className="text-sm text-academic-700 line-clamp-2 bg-academic-50 p-3 rounded-md">
-                        {review.comments}
-                      </p>
-                    </div>
-                  )}
-
-                  {!isCompleted && (
-                    <div className="pt-4 border-t border-academic-200">
+                    <div className="pt-4 border-t border-academic-200 flex flex-col sm:flex-row gap-3">
                       <button
-                        onClick={() => handleStartReview(paper)}
-                        className="w-full py-3 px-4 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                        onClick={() => navigate(`/review/paper/${paper.id}`)}
+                        className="flex-1 py-3 px-4 bg-academic-200 hover:bg-academic-300 text-academic-700 font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-academic-500 focus:ring-offset-2"
                       >
-                        Start Review
+                        View Manuscript
                       </button>
+                      {!isCompleted && (
+                        <button
+                          onClick={() => handleStartReview(paper)}
+                          className="btn-glow"
+                        >
+                          <strong>Start Review</strong>
+                        </button>
+                      )}
                     </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
+                  </div>
+                );
+              })}
+            </div>
+          </>
         )}
 
         {/* Completed Reviews */}
@@ -317,7 +453,7 @@ const ReviewerDashboard = () => {
                     <h3 className="text-lg font-semibold text-academic-900 line-clamp-2 leading-tight">
                       {paper.title}
                     </h3>
-                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    <span className="badge-success">
                       COMPLETED
                     </span>
                   </div>

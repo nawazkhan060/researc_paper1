@@ -12,7 +12,13 @@ const AuthorDashboard = () => {
   const [activeTab, setActiveTab] = useState('submissions');
   const [papers, setPapers] = useState([]);
   const [loading, setLoading] = useState(true);
-    const navigate = useNavigate(); // 👈 Initialize the hookF
+  const [notifications, setNotifications] = useState([]);
+  const [notificationsLoading, setNotificationsLoading] = useState(true);
+  const navigate = useNavigate(); 
+  const [showNotificationsModal, setShowNotificationsModal] = useState(false);
+  const [authorSearchTerm, setAuthorSearchTerm] = useState('');
+  const [authorSortBy, setAuthorSortBy] = useState('recent');
+  const [showAllAuthorPapers, setShowAllAuthorPapers] = useState(false);
   const [showUploadForm, setShowUploadForm] = useState(false);
   const [uploadFormData, setUploadFormData] = useState({
     title: '',
@@ -25,9 +31,13 @@ const AuthorDashboard = () => {
   });
   const [uploading, setUploading] = useState(false);
   const [alert, setAlert] = useState(null);
+  const [revisionModalPaper, setRevisionModalPaper] = useState(null);
+  const [revisionFile, setRevisionFile] = useState(null);
+  const [revisionUploading, setRevisionUploading] = useState(false);
 
   useEffect(() => {
     loadAuthorPapers();
+    loadNotifications();
   }, []);
 
   const loadAuthorPapers = async () => {
@@ -42,6 +52,44 @@ const AuthorDashboard = () => {
       console.error('Error loading papers:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadNotifications = async () => {
+    try {
+      setNotificationsLoading(true);
+      const data = await mockAPI.getNotifications(user.id);
+      setNotifications(data);
+    } catch (error) {
+      console.error('Error loading notifications:', error);
+    } finally {
+      setNotificationsLoading(false);
+    }
+  };
+
+  const handleNotificationClick = async (notificationId) => {
+    setNotifications(prev =>
+      prev.map(notification =>
+        notification.id === notificationId
+          ? { ...notification, read: true }
+          : notification
+      )
+    );
+
+    try {
+      await mockAPI.markNotificationRead(notificationId);
+    } catch (error) {
+      console.error('Error marking notification read:', error);
+    }
+  };
+
+  const handleDeleteNotification = async (notificationId) => {
+    setNotifications(prev => prev.filter(notification => notification.id !== notificationId));
+
+    try {
+      await mockAPI.deleteNotification(notificationId);
+    } catch (error) {
+      console.error('Error deleting notification:', error);
     }
   };
 
@@ -106,6 +154,38 @@ const AuthorDashboard = () => {
     }
   };
 
+  const handleRevisionFileChange = (e) => {
+    const file = e.target.files && e.target.files[0] ? e.target.files[0] : null;
+    setRevisionFile(file);
+  };
+
+  const handleSubmitRevision = async (e) => {
+    e.preventDefault();
+
+    if (!revisionModalPaper || !revisionFile) {
+      setAlert({ type: 'error', message: 'Please choose a revised manuscript file before submitting.' });
+      return;
+    }
+
+    setRevisionUploading(true);
+    try {
+      const result = await mockAPI.uploadRevision(revisionModalPaper.id, user.id, revisionFile);
+      if (result.success) {
+        setAlert({ type: 'success', message: 'Revised manuscript uploaded successfully.' });
+        setRevisionModalPaper(null);
+        setRevisionFile(null);
+        loadAuthorPapers();
+      } else {
+        setAlert({ type: 'error', message: result.error || 'Failed to upload revised manuscript.' });
+      }
+    } catch (error) {
+      console.error('Error uploading revised manuscript:', error);
+      setAlert({ type: 'error', message: 'An error occurred while uploading the revised manuscript.' });
+    } finally {
+      setRevisionUploading(false);
+    }
+  };
+
   const getStatusStats = () => {
     const stats = {
       submitted: papers.filter(p => p.status === 'submitted').length,
@@ -118,6 +198,53 @@ const AuthorDashboard = () => {
 
   const stats = getStatusStats();
 
+  const unreadNotificationsCount = notifications.filter(notification => !notification.read).length;
+
+  const searchTerm = authorSearchTerm.trim().toLowerCase();
+
+  const matchesAuthorSearch = (paper) => {
+    if (!searchTerm) return true;
+
+    const title = (paper.title || '').toLowerCase();
+    const abstract = (paper.abstract || '').toLowerCase();
+    const category = (paper.category || '').toLowerCase();
+    const authorsText = Array.isArray(paper.authors) ? paper.authors.join(' ').toLowerCase() : String(paper.authors || '').toLowerCase();
+
+    return (
+      title.includes(searchTerm) ||
+      abstract.includes(searchTerm) ||
+      category.includes(searchTerm) ||
+      authorsText.includes(searchTerm)
+    );
+  };
+
+  const unfinishedStatuses = ['submitted', 'under_review', 'revisions_requested'];
+
+  let visibleAuthorPapers = (papers || []).filter(matchesAuthorSearch);
+
+  if (!showAllAuthorPapers) {
+    visibleAuthorPapers = visibleAuthorPapers.filter(paper => unfinishedStatuses.includes(paper.status));
+  }
+
+  visibleAuthorPapers = [...visibleAuthorPapers].sort((a, b) => {
+    if (authorSortBy === 'title_az') {
+      return (a.title || '').localeCompare(b.title || '');
+    }
+
+    if (authorSortBy === 'title_za') {
+      return (b.title || '').localeCompare(a.title || '');
+    }
+
+    const dateA = a.submissionDate ? new Date(a.submissionDate) : new Date(0);
+    const dateB = b.submissionDate ? new Date(b.submissionDate) : new Date(0);
+
+    if (authorSortBy === 'oldest') {
+      return dateA - dateB;
+    }
+
+    return dateB - dateA;
+  });
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -129,14 +256,29 @@ const AuthorDashboard = () => {
   return (
     <div className="min-h-screen bg-academic-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="mb-10">
-          <h1 className="text-3xl font-bold text-academic-900 mb-3 leading-tight">
-            Author Dashboard
-          </h1>
-          <p className="text-academic-600 text-lg">
-            Welcome back, <span className="font-medium">{user.name}</span>. Track your research submissions and manage your academic portfolio.
-          </p>
+        <div className="mb-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-academic-900 mb-3 leading-tight">
+              Author Dashboard
+            </h1>
+            <p className="text-academic-600 text-lg">
+              Welcome back, <span className="font-medium">{user.name}</span>. Track your research submissions and manage your academic portfolio.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setShowNotificationsModal(true)}
+            className="inline-flex items-center px-4 py-2 bg-white border border-academic-200 rounded-lg shadow-sm text-sm font-medium text-academic-700 hover:bg-academic-50 transition-colors duration-200"
+          >
+            <svg className="w-5 h-5 text-academic-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+            </svg>
+            {unreadNotificationsCount > 0 && (
+              <span className="ml-2 inline-flex items-center justify-center px-2 py-0.5 text-xs font-semibold bg-primary-600 text-white rounded-full">
+                {unreadNotificationsCount}
+              </span>
+            )}
+          </button>
         </div>
 
         {/* Alert */}
@@ -147,6 +289,73 @@ const AuthorDashboard = () => {
               message={alert.message} 
               onClose={() => setAlert(null)} 
             />
+          </div>
+        )}
+
+        {showNotificationsModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+              <div className="p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-xl font-bold text-academic-900">Notifications</h2>
+                  <button
+                    type="button"
+                    onClick={() => setShowNotificationsModal(false)}
+                    className="text-academic-400 hover:text-academic-600"
+                  >
+                    &times;
+                  </button>
+                </div>
+
+                {notificationsLoading ? (
+                  <p className="text-sm text-academic-500">Loading notifications...</p>
+                ) : notifications.length === 0 ? (
+                  <p className="text-sm text-academic-500">You have no notifications.</p>
+                ) : (
+                  <div className="space-y-3">
+                    {notifications.map(notification => (
+                      <div
+                        key={notification.id}
+                        onClick={() => handleNotificationClick(notification.id)}
+                        className={`p-3 rounded-lg border text-sm cursor-pointer transition-colors duration-200 ${
+                          notification.read
+                            ? 'bg-academic-50 border-academic-100 text-academic-600'
+                            : 'bg-white border-primary-100 text-academic-700 hover:bg-primary-50'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="font-medium">
+                                {notification.title}
+                              </span>
+                              {notification.timestamp && (
+                                <span className="text-xs text-academic-400">
+                                  {new Date(notification.timestamp).toLocaleDateString()}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-xs">
+                              {notification.message}
+                            </p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteNotification(notification.id);
+                            }}
+                            className="ml-2 text-xs text-red-600 hover:text-red-800"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         )}
 
@@ -211,14 +420,14 @@ const AuthorDashboard = () => {
         </div>
 
         {/* Action Buttons */}
-      <div className="mb-10">
-    <button
-      onClick={() => navigate('/submitform')} // 👈 Use the hook
-      className="py-3 px-6 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 shadow-sm hover:shadow-md"
-    >
-      Submit New Paper
-    </button>
-  </div>
+        <div className="mb-10">
+          <button
+            onClick={() => navigate('/submitform')} 
+            className="btn-glow"
+          >
+            <strong>Submit New Paper</strong>
+          </button>
+        </div>
 
         {/* Upload Form Modal */}
         {showUploadForm && (
@@ -436,133 +645,203 @@ const AuthorDashboard = () => {
 
         {/* Papers List */}
         {activeTab === 'submissions' && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {papers.map(paper => (
-              <div key={paper.id} className="bg-white rounded-xl shadow-sm border border-academic-200 p-6 hover:shadow-md transition-all duration-300">
-                <div className="flex justify-between items-start mb-4">
-                  <h3 className="text-lg font-semibold text-academic-900 line-clamp-2 leading-tight">
-                    {paper.title}
-                  </h3>
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                    paper.status === 'published' ? 'bg-green-100 text-green-800' :
-                    paper.status === 'under_review' ? 'bg-yellow-100 text-yellow-800' :
-                    paper.status === 'submitted' ? 'bg-blue-100 text-blue-800' :
-                    'bg-red-100 text-red-800'
-                  }`}>
-                    {paper.status.replace('_', ' ').toUpperCase()}
-                  </span>
-                </div>
+          <>
+            <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <input
+                type="text"
+                value={authorSearchTerm}
+                onChange={(e) => setAuthorSearchTerm(e.target.value)}
+                placeholder="Search by title, author, category..."
+                className="w-full md:max-w-md px-4 py-2 border border-academic-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
+              />
+              <div className="flex items-center gap-3">
+                <select
+                  value={authorSortBy}
+                  onChange={(e) => setAuthorSortBy(e.target.value)}
+                  className="px-3 py-2 border border-academic-200 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                >
+                  <option value="recent">Newest first</option>
+                  <option value="oldest">Oldest first</option>
+                  <option value="title_az">Title A-Z</option>
+                  <option value="title_za">Title Z-A</option>
+                </select>
+                <button
+                  type="button"
+                  onClick={() => setShowAllAuthorPapers(prev => !prev)}
+                  className="px-3 py-2 border border-academic-200 rounded-lg bg-white text-sm font-medium text-academic-700 hover:bg-academic-50"
+                >
+                  {showAllAuthorPapers ? 'Show unfinished only' : 'View all papers'}
+                </button>
+              </div>
+            </div>
 
-                <div className="mb-4 space-y-2">
-                  <div className="flex items-center">
-                    <span className="font-medium text-academic-700 text-sm w-20">Authors:</span>
-                    <span className="text-sm text-academic-600">{paper.authors.join(', ')}</span>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {visibleAuthorPapers.map(paper => (
+                <div key={paper.id} className="bg-white rounded-xl shadow-sm border border-academic-200 p-6 hover:shadow-md transition-all duration-300">
+                  <div className="flex justify-between items-start mb-4">
+                    <h3 className="text-lg font-semibold text-academic-900 line-clamp-2 leading-tight">
+                      {paper.title}
+                    </h3>
+                    <span className={`${
+                      paper.status === 'published' ? 'badge-success' :
+                      paper.status === 'under_review' ? 'badge-warning' :
+                      paper.status === 'submitted' ? 'badge-info' :
+                      'badge-danger'
+                    }`}>
+                      {paper.status.replace('_', ' ').toUpperCase()}
+                    </span>
                   </div>
-                  <div className="flex items-center">
-                    <span className="font-medium text-academic-700 text-sm w-20">Category:</span>
-                    <span className="text-sm text-academic-600">{paper.category}</span>
-                  </div>
-                  <div className="flex items-center">
-                    <span className="font-medium text-academic-700 text-sm w-20">Submitted:</span>
-                    <span className="text-sm text-academic-600">{new Date(paper.submissionDate).toLocaleDateString()}</span>
-                  </div>
-                  {paper.publicationDate && (
+
+                  <div className="mb-4 space-y-2">
                     <div className="flex items-center">
-                      <span className="font-medium text-academic-700 text-sm w-20">Published:</span>
-                      <span className="text-sm text-academic-600">{new Date(paper.publicationDate).toLocaleDateString()}</span>
+                      <span className="font-medium text-academic-700 text-sm w-20">Authors:</span>
+                      <span className="text-sm text-academic-600">{paper.authors.join(', ')}</span>
+                    </div>
+                    
+                    <div className="flex items-center">
+                      <span className="font-medium text-academic-700 text-sm w-20">Submitted:</span>
+                      <span className="text-sm text-academic-600">{new Date(paper.submissionDate).toLocaleDateString()}</span>
+                    </div>
+                    {paper.publicationDate && (
+                      <div className="flex items-center">
+                        <span className="font-medium text-academic-700 text-sm w-20">Published:</span>
+                        <span className="text-sm text-academic-600">{new Date(paper.publicationDate).toLocaleDateString()}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="mb-5">
+                    <p className="text-academic-700 text-sm leading-relaxed line-clamp-3">
+                      {paper.abstract}
+                    </p>
+                  </div>
+
+                  {paper.pdfUrl && (
+                    <div className="mb-5">
+                      <a
+                        href={paper.pdfUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center px-3 py-1.5 bg-academic-100 hover:bg-academic-200 text-academic-700 text-xs font-medium rounded-lg transition-colors duration-200"
+                      >
+                        View Manuscript (latest version)
+                      </a>
+                    </div>
+                  )}
+
+                  {paper.status === 'submitted' && paper.paymentStatus === 'pending' && (
+                    <div className="pt-4 border-t border-academic-200">
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <span className="text-sm text-academic-600 font-medium">
+                            Submission fee: <span className="text-lg font-bold text-primary-600">$150</span>
+                          </span>
+                          <p className="text-xs text-academic-500 mt-1">Complete payment to initiate review</p>
+                        </div>
+                        <button
+                          onClick={() => handlePayment(paper.id)}
+                          className="Btn"
+                        >
+                          <svg className="svgIcon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M2 6L12 13L22 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                          Pay Now
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {paper.status === 'submitted' && paper.paymentStatus === 'paid' && (
+                    <div className="pt-4 border-t border-academic-200">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          <svg className="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                          </svg>
+                          <span className="text-sm text-green-600 font-medium">Payment completed</span>
+                        </div>
+                        <span className="text-sm text-academic-500">
+                          Awaiting reviewer assignment
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  {paper.status === 'under_review' && (
+                    <div className="pt-4 border-t border-academic-200">
+                      <div className="flex flex-col space-y-2">
+                        <div className="flex items-center">
+                          <svg className="w-5 h-5 text-yellow-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                          </svg>
+                          <span className="text-sm text-academic-600">Currently under review</span>
+                        </div>
+                        {paper.reviewDeadline && (
+                          <p className="text-xs text-academic-500">
+                            Estimated completion: {new Date(paper.reviewDeadline).toLocaleDateString()}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {paper.status === 'revisions_requested' && (
+                    <div className="pt-4 border-t border-academic-200">
+                      <div className="flex flex-col space-y-2">
+                        <div className="flex items-center">
+                          <svg className="w-5 h-5 text-orange-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M12 18a9 9 0 110-18 9 9 0 010 18z"></path>
+                          </svg>
+                          <span className="text-sm text-academic-700 font-medium">Revisions requested - please upload a revised manuscript.</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setRevisionModalPaper(paper);
+                            setRevisionFile(null);
+                          }}
+                          className="btn-glow mt-1"
+                        >
+                          <strong>Upload Revised</strong>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {paper.status === 'published' && (
+                    <div className="pt-4 border-t border-academic-200">
+                      <div className="flex items-center">
+                        <svg className="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span className="text-sm text-green-600 font-medium">Congratulations! Your paper has been published.</span>
+                      </div>
+                      {paper.doi && (
+                        <p className="text-xs text-academic-600 mt-1">
+                          DOI: {paper.doi}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  {paper.status === 'rejected' && (
+                    <div className="pt-4 border-t border-academic-200">
+                      <div className="flex items-center">
+                        <svg className="w-5 h-5 text-red-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span className="text-sm text-red-600">This paper was not accepted for publication.</span>
+                      </div>
+                      <p className="text-xs text-academic-500 mt-1">
+                        Consider revising based on feedback and resubmitting.
+                      </p>
                     </div>
                   )}
                 </div>
-
-                <div className="mb-5">
-                  <p className="text-academic-700 text-sm leading-relaxed line-clamp-3">
-                    {paper.abstract}
-                  </p>
-                </div>
-
-                {paper.status === 'submitted' && paper.paymentStatus === 'pending' && (
-                  <div className="pt-4 border-t border-academic-200">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <span className="text-sm text-academic-600 font-medium">
-                          Submission fee: <span className="text-lg font-bold text-primary-600">$150</span>
-                        </span>
-                        <p className="text-xs text-academic-500 mt-1">Complete payment to begin review</p>
-                      </div>
-                      <button
-                        onClick={() => handlePayment(paper.id)}
-                        className="py-2 px-4 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
-                      >
-                        Pay Now
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                {paper.status === 'submitted' && paper.paymentStatus === 'paid' && (
-                  <div className="pt-4 border-t border-academic-200">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <svg className="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                        <span className="text-sm text-green-600 font-medium">Payment completed</span>
-                      </div>
-                      <span className="text-sm text-academic-500">
-                        Awaiting reviewer assignment
-                      </span>
-                    </div>
-                  </div>
-                )}
-
-                {paper.status === 'under_review' && (
-                  <div className="pt-4 border-t border-academic-200">
-                    <div className="flex items-center">
-                      <svg className="w-5 h-5 text-yellow-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                      </svg>
-                      <span className="text-sm text-academic-600">Currently under review</span>
-                    </div>
-                    {paper.reviewDeadline && (
-                      <p className="text-xs text-academic-500 mt-1">
-                        Estimated completion: {new Date(paper.reviewDeadline).toLocaleDateString()}
-                      </p>
-                    )}
-                  </div>
-                )}
-
-                {paper.status === 'published' && (
-                  <div className="pt-4 border-t border-academic-200">
-                    <div className="flex items-center">
-                      <svg className="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                      </svg>
-                      <span className="text-sm text-green-600 font-medium">Congratulations! Your paper has been published.</span>
-                    </div>
-                    {paper.doi && (
-                      <p className="text-xs text-academic-600 mt-1">
-                        DOI: {paper.doi}
-                      </p>
-                    )}
-                  </div>
-                )}
-
-                {paper.status === 'rejected' && (
-                  <div className="pt-4 border-t border-academic-200">
-                    <div className="flex items-center">
-                      <svg className="w-5 h-5 text-red-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                      </svg>
-                      <span className="text-sm text-red-600">This paper was not accepted for publication.</span>
-                    </div>
-                    <p className="text-xs text-academic-500 mt-1">
-                      Consider revising based on feedback and resubmitting.
-                    </p>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </>
         )}
 
         {activeTab === 'pending' && (
@@ -586,8 +865,12 @@ const AuthorDashboard = () => {
                   </div>
                   <button
                     onClick={() => handlePayment(paper.id)}
-                    className="py-2 px-5 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                    className="Btn"
                   >
+                    <svg className="svgIcon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M2 6L12 13L22 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
                     Pay Now
                   </button>
                 </div>
@@ -615,6 +898,89 @@ const AuthorDashboard = () => {
             >
               Submit Your First Paper
             </button>
+          </div>
+        )}
+
+        {/* Revision Upload Modal */}
+        {revisionModalPaper && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+              <div className="p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-xl font-bold text-academic-900">Upload Revised Manuscript</h2>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setRevisionModalPaper(null);
+                      setRevisionFile(null);
+                    }}
+                    className="text-academic-400 hover:text-academic-600"
+                  >
+                    &times;
+                  </button>
+                </div>
+
+                <div className="mb-4 p-4 bg-academic-50 rounded-lg border border-academic-200">
+                  <h3 className="font-semibold text-academic-900 mb-1 line-clamp-2">{revisionModalPaper.title}</h3>
+                  <p className="text-xs text-academic-600">
+                    Upload a revised version of your manuscript in response to reviewer/editor comments.
+                  </p>
+                </div>
+
+                <form onSubmit={handleSubmitRevision} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-academic-700 mb-2">
+                      Revised Manuscript (PDF)
+                    </label>
+                    <div className="mt-1 flex justify-center px-4 pt-5 pb-6 border-2 border-dashed border-academic-300 rounded-lg hover:border-academic-400 transition-colors duration-200">
+                      <div className="space-y-1 text-center">
+                        <svg className="mx-auto h-10 w-10 text-academic-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                          <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                        <div className="flex text-sm text-academic-600 justify-center">
+                          <label className="relative cursor-pointer rounded-md font-medium text-primary-600 hover:text-primary-500">
+                            <span>Select file</span>
+                            <input
+                              type="file"
+                              accept=".pdf"
+                              onChange={handleRevisionFileChange}
+                              className="sr-only"
+                            />
+                          </label>
+                          <p className="pl-1">or drag and drop</p>
+                        </div>
+                        <p className="text-xs text-academic-500">PDF format only, up to 20MB.</p>
+                        {revisionFile && (
+                          <p className="text-xs text-green-700 mt-1">
+                            Selected file: <span className="font-medium">{revisionFile.name}</span>
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex space-x-3 pt-2">
+                    <button
+                      type="submit"
+                      disabled={revisionUploading || !revisionFile}
+                      className="flex-1 py-2 px-4 bg-primary-600 hover:bg-primary-700 disabled:bg-primary-400 text-white text-sm font-medium rounded-lg transition-colors duration-200 flex items-center justify-center"
+                    >
+                      {revisionUploading ? 'Uploading...' : 'Submit Revised Manuscript'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setRevisionModalPaper(null);
+                        setRevisionFile(null);
+                      }}
+                      className="flex-1 py-2 px-4 bg-academic-200 hover:bg-academic-300 text-academic-700 text-sm font-medium rounded-lg transition-colors duration-200"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
           </div>
         )}
       </div>

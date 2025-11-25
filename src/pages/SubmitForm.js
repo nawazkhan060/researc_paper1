@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import LoadingSpinner from '../components/LoadingSpinner';
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:4000';
+
 const SubmitForm = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -22,6 +24,7 @@ const SubmitForm = () => {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   useEffect(() => {
     if (!user) {
@@ -74,17 +77,42 @@ const SubmitForm = () => {
     if (!validate()) return;
     
     setIsSubmitting(true);
+    setSubmitError('');
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      setIsSubmitted(true);
-      
+      const form = new FormData();
+      form.append('fullName', formData.fullName);
+      form.append('email', formData.email);
+      form.append('affiliation', formData.affiliation);
+      form.append('paperTitle', formData.paperTitle);
+      form.append('keywords', formData.keywords || '');
+      form.append('comments', formData.comments || '');
+      if (user?.id) {
+        form.append('userId', String(user.id));
+      }
+
+      if (formData.manuscript) {
+        form.append('manuscript', formData.manuscript);
+      }
+      if (formData.copyrightForm) {
+        form.append('copyrightForm', formData.copyrightForm);
+      }
+
+      const response = await fetch(`${API_BASE_URL}/api/submissions`, {
+        method: 'POST',
+        body: form,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        setSubmitError(data.error || 'Failed to submit paper. Please try again.');
+      } else {
+        setIsSubmitted(true);
+      }
     } catch (error) {
-      // If there was a real API call, you'd set an error alert here.
-      // For this simulation, we'll assume it always succeeds.
-      console.error("Submission failed", error);
+      console.error('Submission failed', error);
+      setSubmitError('Submission failed. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -124,7 +152,7 @@ const SubmitForm = () => {
             Thank you for your submission. You will receive a confirmation email shortly. Our team will review your paper and get back to you.
           </p>
           <button
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate('/author-dashboard')}
             className="py-3 px-6 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-300"
           >
             Back to Dashboard
@@ -140,7 +168,7 @@ const SubmitForm = () => {
         {/* Header */}
         <div className="text-center mb-12">
           <button
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate('/author-dashboard')}
             className="mb-6 flex items-center text-slate-600 hover:text-slate-900 transition-colors self-start"
           >
             <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -159,6 +187,11 @@ const SubmitForm = () => {
         <div className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
           <div className="p-6 sm:p-8">
             <form onSubmit={handleSubmit} className="space-y-8">
+              {submitError && (
+                <div className="mb-4 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+                  {submitError}
+                </div>
+              )}
               {/* Section: Author Information */}
               <div className="border-b border-slate-200 pb-8">
                 <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center">
@@ -292,14 +325,14 @@ const SubmitForm = () => {
                             <input
                               type="file"
                               name="manuscript"
-                              accept=".doc,.docx"
+                              accept=".pdf,.doc,.docx"
                               onChange={handleFileChange}
                               className="sr-only"
                             />
                           </label>
                           <p className="pl-1">or drag and drop</p>
                         </div>
-                        <p className="text-xs text-slate-500">DOC or DOCX format only (Max 20MB)</p>
+                        <p className="text-xs text-slate-500">PDF, DOC, or DOCX format only (Max 20MB)</p>
                         {getFilePreview(formData.manuscript)}
                       </div>
                     </div>

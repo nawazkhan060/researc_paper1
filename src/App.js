@@ -4,6 +4,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import BackToTop from './components/BackToTop';
 
 // Pages
 
@@ -13,6 +14,7 @@ import Register from './pages/Register';
 import AuthorDashboard from './pages/AuthorDashboard';
 import ReviewerDashboard from './pages/ReviewerDashboard';
 import AdminDashboard from './pages/AdminDashboard'; 
+import ReviewPaper from './pages/ReviewPaper';
 import AuthorGuidelines from './pages/AuthorGuidelines';   
 import CallForPapers from './pages/CallForPapers';
 import Indexing from './pages/Indexing';
@@ -60,6 +62,14 @@ function App() {
                   </ProtectedRoute>
                 } 
               />
+              <Route
+                path="/review/paper/:id"
+                element={
+                  <ProtectedRoute requiredRole="reviewer">
+                    <ReviewPaper />
+                  </ProtectedRoute>
+                }
+              />
               <Route 
                 path="/admin-dashboard" 
                 element={
@@ -74,6 +84,7 @@ function App() {
             </Routes>
           </main>
           <Footer />
+          <BackToTop />
         </div>
       </Router>
     </AuthProvider>

@@ -73,7 +73,14 @@ const Register = () => {
       const { confirmPassword, ...userData } = formData;
       const result = await register(userData);
       if (result.success) {
-        navigate('/author-dashboard');
+        const role = userData.role;
+        if (role === 'reviewer') {
+          navigate('/reviewer-dashboard');
+        } else if (role === 'admin' || role === 'editor') {
+          navigate('/admin-dashboard');
+        } else {
+          navigate('/author-dashboard');
+        }
       } else {
         setError(result.error);
       }
@@ -259,9 +266,14 @@ const Register = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                className="button-auth w-full justify-center"
               >
-                {loading ? <LoadingSpinner size="sm" text="" /> : 'Create Account'}
+                <span className="dots_border"></span>
+                <svg className="sparkle" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path className="path" d="M14.8285 14.8285C16.105 13.552 16.105 11.448 14.8285 10.1716C13.552 8.89502 11.448 8.89502 10.1716 10.1716C8.89502 11.448 8.89502 13.552 10.1716 14.8285C11.448 16.105 13.552 16.105 14.8285 14.8285Z" />
+                  <path className="path" d="M12 2V4M12 20V22M4 12H2M22 12H20M19.071 19.071L17.657 17.657M6.343 6.343L4.929 4.929M19.071 4.929L17.657 6.343M6.343 17.657L4.929 19.071" />
+                </svg>
+                <span className="text_button">{loading ? 'Creating Account...' : 'Create Account'}</span>
               </button>
             </div>
           </form>

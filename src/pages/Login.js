@@ -22,8 +22,12 @@ const Login = () => {
     setLoading(true);
 
     try {
-      await login(email, password);
-      navigate(from, { replace: true });
+      const result = await login(email, password);
+      if (result && result.success) {
+        navigate(from, { replace: true });
+      } else {
+        setError(result?.error || 'Failed to sign in. Please check your credentials.');
+      }
     } catch (err) {
       setError('Failed to sign in. Please check your credentials.');
     } finally {
@@ -45,8 +49,12 @@ const Login = () => {
         creds = { email: 'author@example.com', password: 'password123' };
       }
 
-      await login(creds.email, creds.password);
-      navigate('/');
+      const result = await login(creds.email, creds.password);
+      if (result && result.success) {
+        navigate('/');
+      } else {
+        setError(result?.error || 'Demo login failed.');
+      }
     } catch (err) {
       setError('Demo login failed.');
     } finally {
@@ -141,9 +149,14 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors duration-200"
+                className="button-auth w-full justify-center"
               >
-                {loading ? <LoadingSpinner size="sm" /> : 'Sign In'}
+                <span className="dots_border"></span>
+                <svg className="sparkle" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path className="path" d="M14.8285 14.8285C16.105 13.552 16.105 11.448 14.8285 10.1716C13.552 8.89502 11.448 8.89502 10.1716 10.1716C8.89502 11.448 8.89502 13.552 10.1716 14.8285C11.448 16.105 13.552 16.105 14.8285 14.8285Z" />
+                  <path className="path" d="M12 2V4M12 20V22M4 12H2M22 12H20M19.071 19.071L17.657 17.657M6.343 6.343L4.929 4.929M19.071 4.929L17.657 6.343M6.343 17.657L4.929 19.071" />
+                </svg>
+                <span className="text_button">{loading ? 'Signing In...' : 'Sign In'}</span>
               </button>
             </div>
           </form>
