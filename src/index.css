@@ -7,10 +7,16 @@
 @layer base {
   html {
     font-family: 'Playfair Display', 'Georgia', 'Times New Roman', serif;
+    height: 100%;
   }
   
   body {
     @apply bg-academic-50 text-academic-900;
+    min-height: 100%;
+  }
+
+  #root {
+    min-height: 100%;
   }
 }
 
@@ -128,6 +134,12 @@
     transition-duration: .3s;
   }
 
+  /* Primary glowing button style used for main actions (e.g., Submit New Paper, Upload Revised) */
+  .btn-glow {
+    @apply inline-flex items-center justify-center px-6 py-2.5 rounded-full bg-primary-600 text-white font-semibold shadow-md transition-all duration-200;
+    @apply hover:bg-primary-700 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+  }
+
   /* Login/Signup button style by MuhammadHasann */
   .button-auth {
     --black-700: hsla(0 0% 12% / 1);
@@ -149,7 +161,8 @@
 
     border: none;
     border-radius: var(--border_radius);
-    transform: scale(calc(1 + (var(--active, 0) * 0.1)));
+    /* Keep a consistent size on hover/press (no scaling) */
+    transform: scale(1);
 
     transition: transform var(--transtion);
   }

@@ -217,14 +217,14 @@ const BrowsePapers = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="min-h-full flex items-center justify-center bg-slate-50">
         <LoadingSpinner size="lg" text="Loading published papers..." />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 py-10">
+    <div className="min-h-full bg-slate-50 py-10">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <header className="mb-8 text-center">
           <h1 className="text-4xl font-bold text-slate-900 mb-3">Research Library</h1>

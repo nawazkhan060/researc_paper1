@@ -4,6 +4,7 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import { mockAPI } from '../data/mockData';
 import hero from "../components/annie-spratt-5cFwQ-WMcJU-unsplash.jpg"
 
+// We will inject Roboto font for Landing page only
 const Landing = () => {
   const [papers, setPapers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -85,7 +86,12 @@ const Landing = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+        .landing-page-roboto { font-family: 'Roboto', sans-serif; }
+      `}</style>
+      <div className="min-h-full bg-slate-50 landing-page-roboto">
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white"
       style={{
@@ -405,6 +411,7 @@ const Landing = () => {
       {/* About Us Section - IJEPA */}
      
 
+
       {/* Scroll to Top Button */}
       {showScrollTop && (
         <button
@@ -418,7 +425,7 @@ const Landing = () => {
         </button>
       )}
     </div>
-  );
+  </>
+);
 };
-
 export default Landing;

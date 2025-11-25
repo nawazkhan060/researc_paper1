@@ -77,9 +77,9 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-academic-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-full bg-academic-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        {/* ✅ Logo */}
+        {/* Logo */}
         <div className="flex justify-center mb-8">
           <img
             src={logo}
@@ -151,12 +151,21 @@ const Login = () => {
                 disabled={loading}
                 className="button-auth w-full justify-center"
               >
-                <span className="dots_border"></span>
-                <svg className="sparkle" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path className="path" d="M14.8285 14.8285C16.105 13.552 16.105 11.448 14.8285 10.1716C13.552 8.89502 11.448 8.89502 10.1716 10.1716C8.89502 11.448 8.89502 13.552 10.1716 14.8285C11.448 16.105 13.552 16.105 14.8285 14.8285Z" />
-                  <path className="path" d="M12 2V4M12 20V22M4 12H2M22 12H20M19.071 19.071L17.657 17.657M6.343 6.343L4.929 4.929M19.071 4.929L17.657 6.343M6.343 17.657L4.929 19.071" />
-                </svg>
-                <span className="text_button">{loading ? 'Signing In...' : 'Sign In'}</span>
+                {loading ? (
+                  <span className="flex items-center justify-center">
+                    <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></span>
+                    <span className="text_button">Signing In...</span>
+                  </span>
+                ) : (
+                  <>
+                    <span className="dots_border"></span>
+                    <svg className="sparkle" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path className="path" d="M14.8285 14.8285C16.105 13.552 16.105 11.448 14.8285 10.1716C13.552 8.89502 11.448 8.89502 10.1716 10.1716C8.89502 11.448 8.89502 13.552 10.1716 14.8285C11.448 16.105 13.552 16.105 14.8285 14.8285Z" />
+                      <path className="path" d="M12 2V4M12 20V22M4 12H2M22 12H20M19.071 19.071L17.657 17.657M6.343 6.343L4.929 4.929M19.071 4.929L17.657 6.343M6.343 17.657L4.929 19.071" />
+                    </svg>
+                    <span className="text_button">Sign In</span>
+                  </>
+                )}
               </button>
             </div>
           </form>

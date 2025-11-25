@@ -68,7 +68,7 @@ const ReviewPaper = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-academic-50">
+      <div className="min-h-full flex items-center justify-center bg-academic-50">
         <LoadingSpinner size="lg" text="Loading manuscript..." />
       </div>
     );
@@ -76,7 +76,7 @@ const ReviewPaper = () => {
 
   if (error || !paper) {
     return (
-      <div className="min-h-screen bg-academic-50 flex items-center justify-center px-4">
+      <div className="min-h-full bg-academic-50 flex items-center justify-center px-4">
         <div className="max-w-md w-full bg-white shadow-lg rounded-xl p-6 text-center">
           <h1 className="text-xl font-semibold text-academic-900 mb-3">Unable to open manuscript</h1>
           <p className="text-academic-600 mb-6">{error || 'Paper not found.'}</p>
@@ -94,7 +94,7 @@ const ReviewPaper = () => {
   const viewerSupported = paper.pdfUrl && paper.pdfUrl.toLowerCase().endsWith('.pdf');
 
   return (
-    <div className="min-h-screen bg-academic-50 py-6 sm:py-10">
+    <div className="min-h-full bg-academic-50 py-6 sm:py-10">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-4 flex items-center justify-between gap-3">
           <button

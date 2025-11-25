@@ -132,7 +132,7 @@ const SubmitForm = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="min-h-full flex items-center justify-center bg-slate-50">
         <LoadingSpinner size="lg" text="Authenticating..." />
       </div>
     );
@@ -140,7 +140,7 @@ const SubmitForm = () => {
 
   if (isSubmitted) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-full bg-slate-50 flex items-center justify-center">
         <div className="text-center p-8">
           <div className="mx-auto mb-6 w-24 h-24 flex items-center justify-center bg-green-100 rounded-full">
             <svg className="w-16 h-16 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -163,7 +163,7 @@ const SubmitForm = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 py-12">
+    <div className="min-h-full bg-slate-50 py-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12">

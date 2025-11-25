@@ -200,14 +200,14 @@ const ReviewerDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-full flex items-center justify-center">
         <LoadingSpinner size="lg" text="Loading your assignments..." />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-academic-50">
+    <div className="min-h-full bg-academic-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-10">

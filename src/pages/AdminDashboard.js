@@ -31,6 +31,21 @@ const AdminDashboard = () => {
   const [reviewsModalPaper, setReviewsModalPaper] = useState(null);
   const [reviewsModalReviews, setReviewsModalReviews] = useState([]);
 
+  const [showRevisionModal, setShowRevisionModal] = useState(false);
+  const [revisionModalPaper, setRevisionModalPaper] = useState(null);
+  const [revisionNote, setRevisionNote] = useState('');
+  const [revisionSubmitting, setRevisionSubmitting] = useState(false);
+
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [rejectModalPaper, setRejectModalPaper] = useState(null);
+  const [rejectNote, setRejectNote] = useState('');
+  const [rejectSubmitting, setRejectSubmitting] = useState(false);
+
+  const [showAssignIssueModal, setShowAssignIssueModal] = useState(false);
+  const [assignIssuePaper, setAssignIssuePaper] = useState(null);
+  const [selectedIssueId, setSelectedIssueId] = useState('');
+  const [assignIssueSubmitting, setAssignIssueSubmitting] = useState(false);
+
   // Search functionality
   const [issueForm, setIssueForm] = useState({
     volume: '',
@@ -187,52 +202,72 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleRequestRevisions = async (paper) => {
+  const openRequestRevisionsModal = (paper) => {
     if (!paper) return;
+    setRevisionModalPaper(paper);
+    setRevisionNote('');
+    setShowRevisionModal(true);
+  };
 
-    const rawNote = window.prompt(
-      'Please describe the required changes for the author. This message will be sent to them:'
-    );
-    if (rawNote === null) return;
+  const handleRequestRevisions = async () => {
+    if (!revisionModalPaper) return;
 
-    const note = rawNote.trim();
+    const note = revisionNote.trim();
     if (!note) {
       setAlert({ type: 'error', message: 'Please describe the requested changes before sending a revision request.' });
       return;
     }
 
     try {
-      const result = await mockAPI.requestRevisions(paper.id, note);
+      setRevisionSubmitting(true);
+      const result = await mockAPI.requestRevisions(revisionModalPaper.id, note);
       if (result.success) {
         setAlert({ type: 'success', message: 'Revision request sent to the author.' });
+        setShowRevisionModal(false);
+        setRevisionModalPaper(null);
+        setRevisionNote('');
+        loadAdminData();
       } else {
         setAlert({ type: 'error', message: result.error || 'Failed to request revisions.' });
       }
     } catch (error) {
       setAlert({ type: 'error', message: 'An error occurred while requesting revisions.' });
+    } finally {
+      setRevisionSubmitting(false);
     }
   };
 
-  const handleRejectPaper = async (paper) => {
+  const openRejectPaperModal = (paper) => {
     if (!paper) return;
+    setRejectModalPaper(paper);
+    setRejectNote('');
+    setShowRejectModal(true);
+  };
 
-    const note = window.prompt('Optional note to the author explaining the rejection (leave blank for a generic message):');
-    if (note === null) return;
+  const handleRejectPaper = async () => {
+    if (!rejectModalPaper) return;
 
     try {
-      const result = await mockAPI.rejectPaper(paper.id, note.trim() || undefined);
+      setRejectSubmitting(true);
+      const note = rejectNote.trim();
+      const result = await mockAPI.rejectPaper(rejectModalPaper.id, note || undefined);
       if (result.success) {
         setAlert({ type: 'success', message: 'Paper rejected and author notified.' });
+        setShowRejectModal(false);
+        setRejectModalPaper(null);
+        setRejectNote('');
         loadAdminData();
       } else {
         setAlert({ type: 'error', message: result.error || 'Failed to reject paper.' });
       }
     } catch (error) {
       setAlert({ type: 'error', message: 'An error occurred while rejecting the paper.' });
+    } finally {
+      setRejectSubmitting(false);
     }
   };
 
-  const handleAssignPaperToIssue = async (paper) => {
+  const openAssignPaperToIssueModal = (paper) => {
     if (!paper) return;
 
     if (!issues || issues.length === 0) {
@@ -240,26 +275,32 @@ const AdminDashboard = () => {
       return;
     }
 
-    const issueListText = issues
-      .map(i => `${i.id}: Volume ${i.volume}, Issue ${i.issue}${i.month ? ` (${i.month} ${i.year})` : ` (${i.year})`}`)
-      .join('\n');
+    setAssignIssuePaper(paper);
+    if (issues.length > 0) {
+      setSelectedIssueId(String(issues[0].id));
+    } else {
+      setSelectedIssueId('');
+    }
+    setShowAssignIssueModal(true);
+  };
 
-    const input = window.prompt(
-      `Enter the Issue ID to assign this paper to:\n${issueListText}`
-    );
+  const handleAssignPaperToIssue = async () => {
+    if (!assignIssuePaper || !selectedIssueId) return;
 
-    if (input === null) return;
-
-    const issueId = parseInt(input, 10);
+    const issueId = parseInt(selectedIssueId, 10);
     if (Number.isNaN(issueId)) {
       setAlert({ type: 'error', message: 'Invalid issue ID.' });
       return;
     }
 
     try {
-      const result = await mockAPI.assignPaperToIssue(paper.id, issueId);
+      setAssignIssueSubmitting(true);
+      const result = await mockAPI.assignPaperToIssue(assignIssuePaper.id, issueId);
       if (result.success) {
         setAlert({ type: 'success', message: 'Paper assigned to issue successfully.' });
+        setShowAssignIssueModal(false);
+        setAssignIssuePaper(null);
+        setSelectedIssueId('');
         loadAdminData(); // Refresh admin data after assigning paper to issue
       } else {
         setAlert({ type: 'error', message: result.error || 'Failed to assign paper to issue.' });
@@ -267,6 +308,8 @@ const AdminDashboard = () => {
     } catch (error) {
       console.error('Error assigning paper to issue:', error);
       setAlert({ type: 'error', message: 'An error occurred while assigning the paper to an issue.' });
+    } finally {
+      setAssignIssueSubmitting(false);
     }
   };
 
@@ -491,14 +534,14 @@ const AdminDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-full flex items-center justify-center">
         <LoadingSpinner size="lg" text="Loading admin data..." />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-full bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-10">
@@ -694,10 +737,10 @@ const AdminDashboard = () => {
                       ) : (
                         <button
                           type="button"
-                          onClick={() => handleAssignPaperToIssue(paper)}
-                          className="inline-flex items-center px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-medium rounded-lg transition"
+                          onClick={() => openAssignPaperToIssueModal(paper)}
+                          className="inline-flex items-center px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-full shadow-sm transition"
                         >
-                          Assign to Journal Issue
+                          Add to Journal Issue
                         </button>
                       )}
                     </div>
@@ -846,12 +889,20 @@ const AdminDashboard = () => {
                       <div className="mb-5 text-sm text-gray-700">
                         <span className="font-medium">Completed Reviews:</span> {reviews.length}
                         {latestRecommendation && (
-                          <span className="ml-2">
-                            Latest recommendation:{' '}
-                            <span className="font-semibold capitalize">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setReviewsModalPaper(paper);
+                              setReviewsModalReviews(reviews);
+                              setShowReviewsModal(true);
+                            }}
+                            className="ml-3 inline-flex items-center px-3 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold rounded-full border border-indigo-200 transition"
+                          >
+                            Recommendation:
+                            <span className="ml-1 capitalize">
                               {latestRecommendation.replace('_', ' ')}
                             </span>
-                          </span>
+                          </button>
                         )}
                       </div>
                     )}
@@ -1220,14 +1271,14 @@ const AdminDashboard = () => {
                 <div className="flex flex-wrap gap-3 mt-6">
                   <button
                     type="button"
-                    onClick={() => handleRequestRevisions(reviewsModalPaper)}
+                    onClick={() => openRequestRevisionsModal(reviewsModalPaper)}
                     className="py-2 px-4 bg-yellow-100 hover:bg-yellow-200 text-yellow-800 text-sm font-medium rounded-lg transition"
                   >
                     Request Revisions
                   </button>
                   <button
                     type="button"
-                    onClick={() => handleRejectPaper(reviewsModalPaper)}
+                    onClick={() => openRejectPaperModal(reviewsModalPaper)}
                     className="py-2 px-4 bg-red-100 hover:bg-red-200 text-red-700 text-sm font-medium rounded-lg transition"
                   >
                     Reject Paper
@@ -1238,6 +1289,206 @@ const AdminDashboard = () => {
                     className="ml-auto py-2 px-4 bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm font-medium rounded-lg transition"
                   >
                     Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Request Revisions Modal */}
+        {showRevisionModal && revisionModalPaper && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+              <div className="p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-xl font-bold text-gray-900">Request Revisions</h2>
+                  <button
+                    onClick={() => {
+                      setShowRevisionModal(false);
+                      setRevisionModalPaper(null);
+                      setRevisionNote('');
+                    }}
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    &times;
+                  </button>
+                </div>
+
+                <div className="mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <h3 className="font-semibold text-gray-900 mb-1 line-clamp-2">{revisionModalPaper.title}</h3>
+                  <p className="text-xs text-gray-600">
+                    This message will be sent to the author. Please clearly describe the requested changes.
+                  </p>
+                </div>
+
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Message to author
+                  </label>
+                  <textarea
+                    value={revisionNote}
+                    onChange={(e) => setRevisionNote(e.target.value)}
+                    rows={5}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm resize-none"
+                    placeholder="Describe the requested revisions..."
+                  />
+                </div>
+
+                <div className="flex space-x-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={handleRequestRevisions}
+                    disabled={revisionSubmitting || !revisionNote.trim()}
+                    className="flex-1 py-2 px-4 bg-yellow-500 hover:bg-yellow-600 disabled:bg-yellow-300 text-white text-sm font-medium rounded-lg transition"
+                  >
+                    {revisionSubmitting ? 'Sending...' : 'Send Request'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowRevisionModal(false);
+                      setRevisionModalPaper(null);
+                      setRevisionNote('');
+                    }}
+                    className="flex-1 py-2 px-4 bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm font-medium rounded-lg transition"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Reject Paper Modal */}
+        {showRejectModal && rejectModalPaper && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+              <div className="p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-xl font-bold text-gray-900">Reject Paper</h2>
+                  <button
+                    onClick={() => {
+                      setShowRejectModal(false);
+                      setRejectModalPaper(null);
+                      setRejectNote('');
+                    }}
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    &times;
+                  </button>
+                </div>
+
+                <div className="mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <h3 className="font-semibold text-gray-900 mb-1 line-clamp-2">{rejectModalPaper.title}</h3>
+                  <p className="text-xs text-gray-600">
+                    You can optionally include a short note explaining the reason for rejection. This will be shared with the author.
+                  </p>
+                </div>
+
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Optional note to author
+                  </label>
+                  <textarea
+                    value={rejectNote}
+                    onChange={(e) => setRejectNote(e.target.value)}
+                    rows={4}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm resize-none"
+                    placeholder="Explain briefly why the paper is being rejected (optional)."
+                  />
+                </div>
+
+                <div className="flex space-x-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={handleRejectPaper}
+                    disabled={rejectSubmitting}
+                    className="flex-1 py-2 px-4 bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white text-sm font-medium rounded-lg transition"
+                  >
+                    {rejectSubmitting ? 'Rejecting...' : 'Reject Paper'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowRejectModal(false);
+                      setRejectModalPaper(null);
+                      setRejectNote('');
+                    }}
+                    className="flex-1 py-2 px-4 bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm font-medium rounded-lg transition"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Assign to Issue Modal */}
+        {showAssignIssueModal && assignIssuePaper && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+              <div className="p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-xl font-bold text-gray-900">Assign to Journal Issue</h2>
+                  <button
+                    onClick={() => {
+                      setShowAssignIssueModal(false);
+                      setAssignIssuePaper(null);
+                      setSelectedIssueId('');
+                    }}
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    &times;
+                  </button>
+                </div>
+
+                <div className="mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <h3 className="font-semibold text-gray-900 mb-1 line-clamp-2">{assignIssuePaper.title}</h3>
+                  <p className="text-xs text-gray-600">
+                    Choose a journal issue to which this published paper should belong.
+                  </p>
+                </div>
+
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Select issue
+                  </label>
+                  <select
+                    value={selectedIssueId}
+                    onChange={(e) => setSelectedIssueId(e.target.value)}
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-white"
+                  >
+                    <option value="">Choose an issue...</option>
+                    {issues.map((issue) => (
+                      <option key={issue.id} value={issue.id}>
+                        {`Volume ${issue.volume}, Issue ${issue.issue} (${issue.month} ${issue.year})`}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="flex space-x-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={handleAssignPaperToIssue}
+                    disabled={assignIssueSubmitting || !selectedIssueId}
+                    className="flex-1 py-2 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white text-sm font-medium rounded-lg transition"
+                  >
+                    {assignIssueSubmitting ? 'Assigning...' : 'Assign to Issue'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowAssignIssueModal(false);
+                      setAssignIssuePaper(null);
+                      setSelectedIssueId('');
+                    }}
+                    className="flex-1 py-2 px-4 bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm font-medium rounded-lg transition"
+                  >
+                    Cancel
                   </button>
                 </div>
               </div>
