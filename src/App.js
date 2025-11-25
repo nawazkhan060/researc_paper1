@@ -9,6 +9,7 @@ import BackToTop from './components/BackToTop';
 // Pages
 
 import Landing from './pages/Landing';
+import BrowsePapers from './pages/BrowsePapers';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import AuthorDashboard from './pages/AuthorDashboard';
@@ -37,6 +38,7 @@ function App() {
               <Route path="/" element={<Landing />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/papers" element={<BrowsePapers />} />
               <Route path="/author-guidelines" element={<AuthorGuidelines />} />
               <Route path="/indexing" element={<Indexing />} />
                 <Route path="/callforpapers" element={<CallForPapers />} />

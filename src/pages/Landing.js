@@ -120,7 +120,7 @@ const Landing = () => {
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
-                href="#papers"
+                href="/papers"
                 className="group bg-white text-slate-900 hover:bg-indigo-50 font-semibold py-4 px-8 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1"
               >
                 Browse Papers...

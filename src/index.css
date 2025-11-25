@@ -1,10 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   html {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Playfair Display', 'Georgia', 'Times New Roman', serif;
   }
   
   body {
@@ -367,6 +369,10 @@
 
   .badge-danger {
     @apply inline-flex items-center px-2 py-[2px] text-sm font-medium bg-red-500/10 text-red-500 border border-red-500 rounded-md;
+  }
+
+  .badge-revised {
+    @apply inline-flex items-center px-2 py-[2px] text-sm font-medium bg-purple-500/10 text-purple-600 border border-black rounded-md;
   }
 
   .loading-shimmer {

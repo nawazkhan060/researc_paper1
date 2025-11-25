@@ -427,7 +427,7 @@ const ReviewerDashboard = () => {
                       {!isCompleted && (
                         <button
                           onClick={() => handleStartReview(paper)}
-                          className="btn-glow"
+                          className="Btn"
                         >
                           <strong>Start Review</strong>
                         </button>
@@ -646,7 +646,7 @@ const ReviewerDashboard = () => {
                     <button
                       type="submit"
                       disabled={submittingReview}
-                      className="flex-1 py-3 px-4 bg-primary-600 hover:bg-primary-700 disabled:bg-primary-400 text-white font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 flex items-center justify-center"
+                      className="Btn"
                     >
                       {submittingReview ? (
                         <span className="flex items-center">

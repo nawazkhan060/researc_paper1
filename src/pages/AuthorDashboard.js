@@ -722,7 +722,7 @@ const AuthorDashboard = () => {
                         href={paper.pdfUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center px-3 py-1.5 bg-academic-100 hover:bg-academic-200 text-academic-700 text-xs font-medium rounded-lg transition-colors duration-200"
+                        className="inline-flex items-center px-3 py-1.5 bg-academic-100 hover:bg-academic-200 text-academic-700 text-xs font-medium rounded-lg border border-black transition-colors duration-200"
                       >
                         View Manuscript (latest version)
                       </a>

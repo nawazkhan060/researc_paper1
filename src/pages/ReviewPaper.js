@@ -17,6 +17,7 @@ const ReviewPaper = () => {
   const [error, setError] = useState('');
   const [numPages, setNumPages] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
+  const [zoom, setZoom] = useState(1);
 
   useEffect(() => {
     const loadPaper = async () => {
@@ -51,6 +52,18 @@ const ReviewPaper = () => {
 
   const handleNextPage = () => {
     setPageNumber((prev) => (numPages ? Math.min(prev + 1, numPages) : prev + 1));
+  };
+
+  const handleZoomIn = () => {
+    setZoom((prev) => Math.min(prev + 0.25, 2));
+  };
+
+  const handleZoomOut = () => {
+    setZoom((prev) => Math.max(prev - 0.25, 0.5));
+  };
+
+  const handleResetZoom = () => {
+    setZoom(1);
   };
 
   if (loading) {
@@ -127,7 +140,7 @@ const ReviewPaper = () => {
 
           <div
             className="relative bg-academic-900/95"
-            style={{ height: '80vh', overflowY: 'auto' }}
+            style={{ maxHeight: '80vh', overflowY: 'auto' }}
           >
             {viewerSupported ? (
               <div className="relative z-10 flex flex-col items-center justify-start py-6">
@@ -145,29 +158,58 @@ const ReviewPaper = () => {
                     </div>
                   }
                 >
-                  <Page pageNumber={pageNumber} width={900} />
+                  <Page pageNumber={pageNumber} height={650} scale={zoom} />
                 </Document>
                 {numPages && (
-                  <div className="mt-4 flex items-center gap-4 text-xs text-academic-100">
-                    <button
-                      type="button"
-                      onClick={handlePrevPage}
-                      disabled={pageNumber <= 1}
-                      className="px-3 py-1 rounded bg-academic-800 disabled:opacity-50"
-                    >
-                      Previous
-                    </button>
-                    <span>
-                      Page {pageNumber} of {numPages}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={handleNextPage}
-                      disabled={numPages && pageNumber >= numPages}
-                      className="px-3 py-1 rounded bg-academic-800 disabled:opacity-50"
-                    >
-                      Next
-                    </button>
+                  <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-academic-100 justify-center">
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={handleZoomOut}
+                        className="px-2 py-1 rounded bg-academic-800 disabled:opacity-50"
+                        disabled={zoom <= 0.5}
+                      >
+                        -
+                      </button>
+                      <span>{Math.round(zoom * 100)}%</span>
+                      <button
+                        type="button"
+                        onClick={handleZoomIn}
+                        className="px-2 py-1 rounded bg-academic-800 disabled:opacity-50"
+                        disabled={zoom >= 2}
+                      >
+                        +
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleResetZoom}
+                        className="px-3 py-1 rounded bg-academic-800/70 hover:bg-academic-800"
+                      >
+                        Reset
+                      </button>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={handlePrevPage}
+                        disabled={pageNumber <= 1}
+                        className="px-3 py-1 rounded bg-academic-800 disabled:opacity-50"
+                      >
+                        Previous
+                      </button>
+                      <span>
+                        Page {pageNumber} of {numPages}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={handleNextPage}
+                        disabled={numPages && pageNumber >= numPages}
+                        className="px-3 py-1 rounded bg-academic-800 disabled:opacity-50"
+                      >
+                        Next
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>

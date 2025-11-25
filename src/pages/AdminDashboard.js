@@ -41,6 +41,7 @@ const AdminDashboard = () => {
 
   const [searchTerm, setSearchTerm] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [reviewerSortBy, setReviewerSortBy] = useState('name_az');
   const dropdownRef = useRef(null);
   const inputRef = useRef(null);
   const [adminSearchTerm, setAdminSearchTerm] = useState('');
@@ -362,15 +363,41 @@ const AdminDashboard = () => {
         ...prev,
         [issue.id]: [],
       }));
-    } finally {
       setIssuePapersLoadingId(null);
     }
   };
 
-  const filteredReviewers = reviewers.filter(reviewer =>
-    reviewer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    reviewer.affiliation.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const reviewerSearch = searchTerm.trim().toLowerCase();
+
+  let filteredReviewers = reviewers.filter((reviewer) => {
+    const name = (reviewer.name || '').toLowerCase();
+    const email = (reviewer.email || '').toLowerCase();
+    const affiliation = (reviewer.affiliation || '').toLowerCase();
+
+    if (!reviewerSearch) return true;
+
+    return (
+      name.includes(reviewerSearch) ||
+      email.includes(reviewerSearch) ||
+      affiliation.includes(reviewerSearch)
+    );
+  });
+
+  filteredReviewers = [...filteredReviewers].sort((a, b) => {
+    if (reviewerSortBy === 'name_az') {
+      return (a.name || '').localeCompare(b.name || '');
+    }
+
+    if (reviewerSortBy === 'name_za') {
+      return (b.name || '').localeCompare(a.name || '');
+    }
+
+    if (reviewerSortBy === 'affiliation_az') {
+      return (a.affiliation || '').localeCompare(b.affiliation || '');
+    }
+
+    return 0;
+  });
 
   const getStatusStats = () => {
     const stats = {
@@ -763,7 +790,7 @@ const AdminDashboard = () => {
 
                 return (
                   <div key={paper.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition">
-                    <div className="flex justify-between items-start mb-4">
+                    <div className="flex justify-between items-start mb-2">
                       <div className="flex-1 mr-3 space-y-1">
                         <h3 className="text-lg font-semibold text-gray-900 line-clamp-2">{paper.title}</h3>
                         {paper.status === 'revisions_requested' && (
@@ -781,6 +808,22 @@ const AdminDashboard = () => {
                         UNDER REVIEW
                       </span>
                     </div>
+
+                    {reviews.length > 0 && (
+                      <div className="mb-3">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setReviewsModalPaper(paper);
+                            setReviewsModalReviews(reviews);
+                            setShowReviewsModal(true);
+                          }}
+                          className="mt-1 text-blue-600 hover:text-blue-800 text-xs font-medium"
+                        >
+                          View all reviews
+                        </button>
+                      </div>
+                    )}
 
                     <div className="mb-4 space-y-2 text-sm">
                       <div><span className="font-medium">Authors:</span> {paper.authors.join(', ')}</div>
@@ -810,17 +853,6 @@ const AdminDashboard = () => {
                             </span>
                           </span>
                         )}
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setReviewsModalPaper(paper);
-                            setReviewsModalReviews(reviews);
-                            setShowReviewsModal(true);
-                          }}
-                          className="ml-3 text-blue-600 hover:text-blue-800 text-xs font-medium"
-                        >
-                          View all reviews
-                        </button>
                       </div>
                     )}
 
@@ -835,7 +867,7 @@ const AdminDashboard = () => {
                         <button
                           onClick={() => handlePublishPaper(paper.id)}
                           disabled={reviews.length === 0}
-                          className="btn-glow disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="Btn disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           <strong>Publish Paper</strong>
                         </button>
@@ -1020,8 +1052,9 @@ const AdminDashboard = () => {
         {/* Assign Reviewer Modal */}
         {showAssignModal && selectedPaper && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-xl max-w-md w-full shadow-2xl">
+            <div className="bg-white rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
               <div className="p-6">
+
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-xl font-bold text-gray-900">Assign Reviewer</h2>
                   <button
@@ -1041,60 +1074,76 @@ const AdminDashboard = () => {
                   </div>
                 </div>
 
-                <div className="mb-6 relative" ref={dropdownRef}>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Select Reviewer</label>
+                <div className="mb-6" ref={dropdownRef}>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
+                    <div className="relative flex-1">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Search Reviewers</label>
+                      <input
+                        ref={inputRef}
+                        type="text"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        placeholder="Search by name, email, or affiliation..."
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10"
+                      />
+                      <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none mt-5 sm:mt-0">
+                        <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                      </div>
+                    </div>
 
-                  {/* Search Input */}
-                  <div className="relative">
-                    <input
-                      ref={inputRef}
-                      type="text"
-                      value={searchTerm}
-                      onChange={(e) => {
-                        setSearchTerm(e.target.value);
-                        setIsDropdownOpen(true);
-                      }}
-                      onFocus={() => setIsDropdownOpen(true)}
-                      placeholder="Search reviewers by name or affiliation..."
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10"
-                    />
-                    <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                      <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                      </svg>
+                    <div className="w-full sm:w-56">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Sort By</label>
+                      <select
+                        value={reviewerSortBy}
+                        onChange={(e) => setReviewerSortBy(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      >
+                        <option value="name_az">Name A-Z</option>
+                        <option value="name_za">Name Z-A</option>
+                        <option value="affiliation_az">Affiliation A-Z</option>
+                      </select>
                     </div>
                   </div>
 
-                  {/* Dropdown */}
-                  {isDropdownOpen && (
-                    <div 
-                      className="absolute z-10 mt-1 w-full bg-white shadow-lg rounded-md border border-gray-200 max-h-60 overflow-y-auto"
-                      style={{ width: inputRef.current?.offsetWidth || '100%' }}
-                    >
-                      {filteredReviewers.length > 0 ? (
-                        filteredReviewers.map(reviewer => (
-                          <div
-                            key={reviewer.id}
-                            className={`px-3 py-2 hover:bg-gray-100 cursor-pointer ${
-                              selectedReviewer === String(reviewer.id) ? 'bg-blue-50' : ''
-                            }`}
-                            onClick={() => {
-                              setSelectedReviewer(String(reviewer.id));
-                              setSearchTerm(reviewer.name);
-                              setIsDropdownOpen(false);
-                            }}
-                          >
-                            <div className="font-medium text-gray-900">{reviewer.name}</div>
-                            <div className="text-sm text-gray-500">{reviewer.affiliation}</div>
+                  <div className="border border-gray-200 rounded-lg max-h-72 overflow-y-auto divide-y">
+                    {filteredReviewers.length > 0 ? (
+                      filteredReviewers.map((reviewer) => (
+                        <button
+                          type="button"
+                          key={reviewer.id}
+                          onClick={() => {
+                            setSelectedReviewer(String(reviewer.id));
+                            setSearchTerm(reviewer.name || reviewer.email || '');
+                          }}
+                          className={`w-full text-left px-3 py-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 ${
+                            selectedReviewer === String(reviewer.id)
+                              ? 'bg-blue-50 border-l-4 border-blue-400'
+                              : 'hover:bg-gray-50'
+                          }`}
+                        >
+                          <div>
+                            <div className="font-medium text-gray-900">
+                              {reviewer.name || 'Unnamed reviewer'}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              {reviewer.email && <span>{reviewer.email}</span>}
+                              {reviewer.affiliation && (
+                                <span className="ml-1">
+                                  • {reviewer.affiliation}
+                                </span>
+                              )}
+                            </div>
                           </div>
-                        ))
-                      ) : (
-                        <div className="px-3 py-2 text-gray-500">
-                          No reviewers found
-                        </div>
-                      )}
-                    </div>
-                  )}
+                        </button>
+                      ))
+                    ) : (
+                      <div className="px-3 py-4 text-sm text-gray-500 text-center">
+                        No reviewers found. Try a different search.
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 <div className="flex space-x-3">
