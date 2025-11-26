@@ -274,7 +274,7 @@ const AuthorDashboard = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
             </svg>
             {unreadNotificationsCount > 0 && (
-              <span className="ml-2 inline-flex items-center justify-center px-2 py-0.5 text-xs font-semibold bg-primary-600 text-white rounded-full">
+              <span className="ml-2 inline-flex items-center justify-center px-2 py-0.5 text-xs font-semibold bg-amber-700 text-white rounded-full">
                 {unreadNotificationsCount}
               </span>
             )}
@@ -320,7 +320,7 @@ const AuthorDashboard = () => {
                         className={`p-3 rounded-lg border text-sm cursor-pointer transition-colors duration-200 ${
                           notification.read
                             ? 'bg-academic-50 border-academic-100 text-academic-600'
-                            : 'bg-white border-primary-100 text-academic-700 hover:bg-primary-50'
+                            : 'bg-white border-amber-100 text-academic-700 hover:bg-amber-50'
                         }`}
                       >
                         <div className="flex items-start justify-between gap-3">
@@ -363,8 +363,8 @@ const AuthorDashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
           <div className="bg-white rounded-xl shadow-sm border border-academic-200 p-6 transition-all duration-300 hover:shadow-md">
             <div className="flex items-center">
-              <div className="p-3 bg-blue-50 rounded-xl">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="p-3 bg-amber-50 rounded-xl">
+                <svg className="w-6 h-6 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                 </svg>
               </div>
@@ -454,7 +454,7 @@ const AuthorDashboard = () => {
                       name="title"
                       value={uploadFormData.title}
                       onChange={handleUploadFormChange}
-                      className="w-full px-4 py-3 border border-academic-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200"
+                      className="w-full px-4 py-3 border border-academic-300 rounded-lg focus:ring-2 focus:ring-amber-700 focus:border-amber-700 transition-colors duration-200"
                       placeholder="Enter paper title"
                       required
                     />
@@ -467,7 +467,7 @@ const AuthorDashboard = () => {
                       name="authors"
                       value={uploadFormData.authors}
                       onChange={handleUploadFormChange}
-                      className="w-full px-4 py-3 border border-academic-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200"
+                      className="w-full px-4 py-3 border border-academic-300 rounded-lg focus:ring-2 focus:ring-amber-700 focus:border-amber-700 transition-colors duration-200"
                       placeholder="Author 1, Author 2, Author 3"
                       required
                     />
@@ -480,7 +480,7 @@ const AuthorDashboard = () => {
                       name="abstract"
                       value={uploadFormData.abstract}
                       onChange={handleUploadFormChange}
-                      className="w-full px-4 py-3 border border-academic-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200 resize-none"
+                      className="w-full px-4 py-3 border border-academic-300 rounded-lg focus:ring-2 focus:ring-amber-700 focus:border-amber-700 transition-colors duration-200 resize-none"
                       placeholder="Enter paper abstract (150-300 words)"
                       rows="6"
                       required
@@ -494,7 +494,7 @@ const AuthorDashboard = () => {
                       name="keywords"
                       value={uploadFormData.keywords}
                       onChange={handleUploadFormChange}
-                      className="w-full px-4 py-3 border border-academic-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200"
+                      className="w-full px-4 py-3 border border-academic-300 rounded-lg focus:ring-2 focus:ring-amber-700 focus:border-amber-700 transition-colors duration-200"
                       placeholder="keyword1, keyword2, keyword3"
                       required
                     />
@@ -508,7 +508,7 @@ const AuthorDashboard = () => {
                         name="category"
                         value={uploadFormData.category}
                         onChange={handleUploadFormChange}
-                        className="w-full px-4 py-3 border border-academic-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200"
+                        className="w-full px-4 py-3 border border-academic-300 rounded-lg focus:ring-2 focus:ring-amber-700 focus:border-amber-700 transition-colors duration-200"
                         required
                       >
                         <option value="">Select category</option>
@@ -528,7 +528,7 @@ const AuthorDashboard = () => {
                         name="wordCount"
                         value={uploadFormData.wordCount}
                         onChange={handleUploadFormChange}
-                        className="w-full px-4 py-3 border border-academic-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200"
+                        className="w-full px-4 py-3 border border-academic-300 rounded-lg focus:ring-2 focus:ring-amber-700 focus:border-amber-700 transition-colors duration-200"
                         placeholder="e.g., 5000"
                         min="500"
                         required
@@ -545,7 +545,7 @@ const AuthorDashboard = () => {
                           <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                         <div className="flex text-sm text-academic-600">
-                          <label className="relative cursor-pointer rounded-md font-medium text-primary-600 hover:text-primary-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary-500">
+                          <label className="relative cursor-pointer rounded-md font-medium text-amber-700 hover:text-amber-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-amber-700">
                             <span>Upload a file</span>
                             <input
                               type="file"
@@ -574,14 +574,14 @@ const AuthorDashboard = () => {
                   <div className="bg-academic-50 p-5 rounded-xl border border-academic-200">
                     <div className="flex items-start">
                       <div className="flex-shrink-0">
-                        <svg className="h-6 w-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="h-6 w-6 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                          <p>Submission fee: <strong className="text-lg text-amber-700">₹150</strong></p>
                         </svg>
                       </div>
                       <div className="ml-3">
                         <h3 className="text-sm font-medium text-academic-900">Submission Information</h3>
                         <div className="mt-2 text-sm text-academic-600">
-                          <p>Submission fee: <strong className="text-lg text-primary-600">$150</strong></p>
                           <p className="mt-1">Payment is required to initiate the review process. You can pay immediately after submission.</p>
                         </div>
                       </div>
@@ -592,7 +592,7 @@ const AuthorDashboard = () => {
                     <button
                       type="submit"
                       disabled={uploading}
-                      className="flex-1 py-3 px-4 bg-primary-600 hover:bg-primary-700 disabled:bg-primary-400 text-white font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 flex items-center justify-center"
+                      className="flex-1 py-3 px-4 bg-amber-700 hover:bg-amber-800 disabled:bg-amber-500 text-white font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-amber-700 focus:ring-offset-2 flex items-center justify-center"
                     >
                       {uploading ? (
                         <span className="flex items-center">
@@ -623,7 +623,7 @@ const AuthorDashboard = () => {
                 onClick={() => setActiveTab('submissions')}
                 className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
                   activeTab === 'submissions'
-                    ? 'border-primary-500 text-primary-600'
+                    ? 'border-amber-500 text-amber-600'
                     : 'border-transparent text-academic-500 hover:text-academic-700 hover:border-academic-300'
                 }`}
               >
@@ -633,7 +633,7 @@ const AuthorDashboard = () => {
                 onClick={() => setActiveTab('pending')}
                 className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
                   activeTab === 'pending'
-                    ? 'border-primary-500 text-primary-600'
+                    ? 'border-amber-500 text-amber-600'
                     : 'border-transparent text-academic-500 hover:text-academic-700 hover:border-academic-300'
                 }`}
               >
@@ -652,13 +652,13 @@ const AuthorDashboard = () => {
                 value={authorSearchTerm}
                 onChange={(e) => setAuthorSearchTerm(e.target.value)}
                 placeholder="Search by title, author, category..."
-                className="w-full md:max-w-md px-4 py-2 border border-academic-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
+                className="w-full md:max-w-md px-4 py-2 border border-academic-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-700 focus:border-amber-700 text-sm"
               />
               <div className="flex items-center gap-3">
                 <select
                   value={authorSortBy}
                   onChange={(e) => setAuthorSortBy(e.target.value)}
-                  className="px-3 py-2 border border-academic-200 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="px-3 py-2 border border-academic-200 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-amber-700 focus:border-amber-700"
                 >
                   <option value="recent">Newest first</option>
                   <option value="oldest">Oldest first</option>

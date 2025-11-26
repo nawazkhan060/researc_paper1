@@ -98,7 +98,7 @@ const Login = () => {
           Or{' '}
           <Link
             to="/register"
-            className="font-medium text-primary-600 hover:text-primary-500 transition-colors duration-200"
+            className="font-medium text-amber-700 hover:text-amber-800 transition-colors duration-200"
           >
             create a new account
           </Link>
@@ -122,7 +122,7 @@ const Login = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="appearance-none block w-full px-3 py-2 border border-academic-300 rounded-md shadow-sm placeholder-academic-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                  className="appearance-none block w-full px-3 py-2 border border-academic-300 rounded-md shadow-sm placeholder-academic-400 focus:outline-none focus:ring-amber-700 focus:border-amber-700 sm:text-sm"
                 />
               </div>
             </div>
@@ -149,22 +149,15 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="button-auth w-full justify-center"
+                className="button w-full justify-center"
               >
                 {loading ? (
-                  <span className="flex items-center justify-center">
-                    <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></span>
-                    <span className="text_button">Signing In...</span>
-                  </span>
+                  <p className="flex items-center justify-center gap-2 text-sm">
+                    <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
+                    <span>Signing In...</span>
+                  </p>
                 ) : (
-                  <>
-                    <span className="dots_border"></span>
-                    <svg className="sparkle" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path className="path" d="M14.8285 14.8285C16.105 13.552 16.105 11.448 14.8285 10.1716C13.552 8.89502 11.448 8.89502 10.1716 10.1716C8.89502 11.448 8.89502 13.552 10.1716 14.8285C11.448 16.105 13.552 16.105 14.8285 14.8285Z" />
-                      <path className="path" d="M12 2V4M12 20V22M4 12H2M22 12H20M19.071 19.071L17.657 17.657M6.343 6.343L4.929 4.929M19.071 4.929L17.657 6.343M6.343 17.657L4.929 19.071" />
-                    </svg>
-                    <span className="text_button">Sign In</span>
-                  </>
+                  <p>Sign In</p>
                 )}
               </button>
             </div>
@@ -174,7 +167,7 @@ const Login = () => {
           <div className="mt-6 flex items-center justify-center">
             <Link
               to="/forgot-password"
-              className="text-sm font-medium text-primary-600 hover:text-primary-500"
+              className="text-sm font-medium text-amber-700 hover:text-amber-800"
             >
               Forgot your password?
             </Link>
@@ -196,26 +189,7 @@ const Login = () => {
           </div>
 
           {/* ✅ Demo login buttons */}
-          <div className="mt-6 grid grid-cols-1 gap-3">
-            <button
-              onClick={() => handleDemoLogin('admin')}
-              className="w-full py-2 px-4 border rounded-md shadow-sm text-sm font-medium bg-gray-100 hover:bg-gray-200"
-            >
-              Demo Login as Admin
-            </button>
-            <button
-              onClick={() => handleDemoLogin('reviewer')}
-              className="w-full py-2 px-4 border rounded-md shadow-sm text-sm font-medium bg-gray-100 hover:bg-gray-200"
-            >
-              Demo Login as Reviewer
-            </button>
-            <button
-              onClick={() => handleDemoLogin('author')}
-              className="w-full py-2 px-4 border rounded-md shadow-sm text-sm font-medium bg-gray-100 hover:bg-gray-200"
-            >
-              Demo Login as Author
-            </button>
-          </div>
+         
         </div>
       </div>
     </div>

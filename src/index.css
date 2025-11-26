@@ -134,6 +134,15 @@
     transition-duration: .3s;
   }
 
+  .back-to-top-btn {
+    @apply fixed bottom-8 right-8 bg-slate-900 hover:bg-slate-800 text-white p-4 rounded-full shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-xl z-50 flex items-center justify-center;
+  }
+
+  .back-to-top-btn .svgIcon {
+    width: 20px;
+    height: 20px;
+  }
+
   /* Primary glowing button style used for main actions (e.g., Submit New Paper, Upload Revised) */
   .btn-glow {
     @apply inline-flex items-center justify-center px-6 py-2.5 rounded-full bg-primary-600 text-white font-semibold shadow-md transition-all duration-200;
@@ -321,6 +330,77 @@
 
     font-size: 1rem;
     color: transparent;
+  }
+
+  /* Auth primary button style from Uiverse.io by Randdose - brown/amber theme */
+  .button {
+    all: unset;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 0.6em 0.8em;
+    border: #a16207 solid 0.15em;
+    border-radius: 0.25em;
+    color: #a16207;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    overflow: hidden;
+    transition: border 300ms, color 300ms;
+    user-select: none;
+  }
+
+  .button p {
+    z-index: 1;
+  }
+
+  .button:hover {
+    color: #212121;
+  }
+
+  .button:active {
+    border-color: #78350f;
+  }
+
+  .button::after,
+  .button::before {
+    content: "";
+    position: absolute;
+    width: 6em;
+    aspect-ratio: 1;
+    background: #a16207;
+    opacity: 45%;
+    border-radius: 50%;
+    transition: transform 500ms, background 300ms;
+  }
+
+  .button::before {
+    left: 0;
+    transform: translateX(-5em);
+  }
+
+  .button::after {
+    right: 0;
+    transform: translateX(5em);
+  }
+
+  .button:hover::before {
+    transform: translateX(-0.8em);
+  }
+
+  .button:hover::after {
+    transform: translateX(0.8em);
+  }
+
+  .button:active::before,
+  .button:active::after {
+    background: #78350f;
+  }
+
+  .button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 
   /* Badge styles by kamehame-ha - neutral design for paper cards */

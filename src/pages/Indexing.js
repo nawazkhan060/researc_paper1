@@ -21,13 +21,13 @@ const Indexing = () => {
         {/* Hero Section */}
         <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white py-20">
           <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-pulse"></div>
-            <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-pulse animation-delay-2000"></div>
+            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-amber-600 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-pulse"></div>
+            <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-amber-400 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-pulse animation-delay-2000"></div>
           </div>
           
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h1 className="text-4xl md:text-5xl font-bold mb-6">
-              Indexing & <span className="text-indigo-300">Abstracting</span>
+              Indexing & <span className="text-amber-200">Abstracting</span>
             </h1>
             <p className="text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed">
               Enhancing global visibility, accessibility, and impact of your research through strategic database partnerships.
@@ -62,8 +62,8 @@ const Indexing = () => {
                   className="bg-white rounded-2xl p-6 shadow-lg border border-slate-200 hover:shadow-xl transition-all duration-300"
                 >
                   <div className="flex items-start">
-                    <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
-                      <svg className="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
+                      <svg className="w-5 h-5 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9" />
                       </svg>
                     </div>
@@ -80,12 +80,8 @@ const Indexing = () => {
           {/* Indexing in Progress */}
           <section className="mb-20">
             <div className="flex items-center mb-8">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
-                {/* <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg> */}
+              <div className="w-10 h-10 bg-amber-50 rounded-lg flex items-center justify-center mr-4">
               </div>
-              {/* <h2 className="text-3xl font-bold text-slate-900">Indexing in Progress</h2> */}
             </div>
             
             <div className="space-y-6">
@@ -95,7 +91,7 @@ const Indexing = () => {
 
           {/* Importance of Indexing */}
           <section className="mb-16">
-            <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl p-8 border border-indigo-100">
+            <div className="bg-gradient-to-r from-amber-50 to-amber-100 rounded-2xl p-8 border border-amber-100">
               <h2 className="text-3xl font-bold text-slate-900 mb-6 text-center">
                 Why Indexing Matters
               </h2>
@@ -107,7 +103,7 @@ const Indexing = () => {
                   'Compliance with academic and institutional requirements for quality publications.'
                 ].map((benefit, i) => (
                   <div key={i} className="flex items-start">
-                    <div className="flex-shrink-0 w-6 h-6 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                    <div className="flex-shrink-0 w-6 h-6 bg-amber-100 text-amber-800 rounded-full flex items-center justify-center mr-3 mt-0.5">
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                       </svg>
@@ -124,8 +120,8 @@ const Indexing = () => {
             <div className="bg-white rounded-2xl p-8 shadow-lg border border-slate-200">
               <div className="flex flex-col md:flex-row items-center">
                 <div className="flex-shrink-0 mb-6 md:mb-0 md:mr-8">
-                  <div className="w-16 h-16 bg-indigo-100 rounded-2xl flex items-center justify-center">
-                    <svg className="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center">
+                    <svg className="w-8 h-8 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path d="M13 10V3L4 14h7v7l9-11h-7z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                   </div>

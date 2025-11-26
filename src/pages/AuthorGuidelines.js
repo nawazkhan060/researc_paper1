@@ -106,7 +106,7 @@ const AuthorGuidelines = () => {
             <section>
               <h2 className="text-2xl font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">5. Submission Process</h2>
               <ul className="list-disc pl-6 space-y-2 text-slate-700">
-                <li>Manuscripts should be submitted via the <a href="/SubmitForm" className="text-indigo-600 hover:underline">Online Submission System</a> or emailed directly to <span className="font-mono">editor@ijepa.org</span>.</li>
+                <li>Manuscripts should be submitted via the <a href="/SubmitForm" className="text-amber-700 hover:underline">Online Submission System</a> or emailed directly to <span className="font-mono">editor@ijepa.org</span>.</li>
                 <li>Along with the manuscript, authors must provide:
                   <ul className="list-none pl-4 mt-2 space-y-1">
                     <li>• A cover letter highlighting the contribution of the paper.</li>
@@ -122,7 +122,7 @@ const AuthorGuidelines = () => {
               <p className="text-slate-700 mb-3">
                 To support the open-access policy and editorial process, the following Article Processing Charges (APC) apply:
               </p>
-              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
                 <ul className="space-y-2">
                   <li className="flex justify-between">
                     <span>Indian Authors:</span>
@@ -133,7 +133,7 @@ const AuthorGuidelines = () => {
                     <span className="font-semibold">USD 50 per accepted paper</span>
                   </li>
                 </ul>
-                <p className="mt-3 text-sm text-blue-800 italic">
+                <p className="mt-3 text-sm text-amber-800 italic">
                   Note: No submission fees are charged. Authors are required to pay only after acceptance of the manuscript.
                 </p>
               </div>
@@ -145,7 +145,7 @@ const AuthorGuidelines = () => {
               <p className="text-slate-700 mb-4">
                 Authors must prepare their manuscripts using the official IJEPA Paper Template to ensure uniformity.
               </p>
-              <a href="#" className="inline-flex items-center px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors">
+              <a href="#" className="inline-flex items-center px-5 py-2.5 bg-amber-700 hover:bg-amber-800 text-white font-medium rounded-lg transition-colors">
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                 </svg>
@@ -165,7 +165,7 @@ const AuthorGuidelines = () => {
               </ul>
               <a
                 href="#"
-                className="inline-flex items-center px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition-colors"
+                className="inline-flex items-center px-5 py-2.5 bg-amber-800 hover:bg-amber-900 text-white font-medium rounded-lg transition-colors"
               >
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />

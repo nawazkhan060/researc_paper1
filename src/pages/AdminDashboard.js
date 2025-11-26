@@ -566,8 +566,8 @@ const AdminDashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition">
             <div className="flex items-center">
-              <div className="p-3 bg-blue-50 rounded-xl">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="p-3 bg-amber-50 rounded-xl">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-amber-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
@@ -630,7 +630,7 @@ const AdminDashboard = () => {
                 onClick={() => setActiveTab('submissions')}
                 className={`py-4 px-1 border-b-2 font-medium text-sm ${
                   activeTab === 'submissions'
-                    ? 'border-blue-500 text-blue-600'
+                    ? 'border-amber-700 text-amber-700'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
@@ -640,7 +640,7 @@ const AdminDashboard = () => {
                 onClick={() => setActiveTab('pending')}
                 className={`py-4 px-1 border-b-2 font-medium text-sm ${
                   activeTab === 'pending'
-                    ? 'border-blue-500 text-blue-600'
+                    ? 'border-amber-700 text-amber-700'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
@@ -650,7 +650,7 @@ const AdminDashboard = () => {
                 onClick={() => setActiveTab('issues')}
                 className={`py-4 px-1 border-b-2 font-medium text-sm ${
                   activeTab === 'issues'
-                    ? 'border-blue-500 text-blue-600'
+                    ? 'border-amber-700 text-amber-700'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
@@ -660,7 +660,7 @@ const AdminDashboard = () => {
                 onClick={() => setActiveTab('review')}
                 className={`py-4 px-1 border-b-2 font-medium text-sm ${
                   activeTab === 'review'
-                    ? 'border-blue-500 text-blue-600'
+                    ? 'border-amber-700 text-amber-700'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
@@ -679,13 +679,13 @@ const AdminDashboard = () => {
                 value={adminSearchTerm}
                 onChange={(e) => setAdminSearchTerm(e.target.value)}
                 placeholder="Search by title, author, category..."
-                className="w-full md:max-w-md px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                className="w-full md:max-w-md px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-sm"
               />
               <div className="flex items-center gap-3">
                 <select
                   value={adminSortBy}
                   onChange={(e) => setAdminSortBy(e.target.value)}
-                  className="px-3 py-2 border border-gray-200 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="px-3 py-2 border border-gray-200 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                 >
                   <option value="recent">Newest first</option>
                   <option value="oldest">Oldest first</option>
@@ -738,7 +738,7 @@ const AdminDashboard = () => {
                         <button
                           type="button"
                           onClick={() => openAssignPaperToIssueModal(paper)}
-                          className="inline-flex items-center px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-full shadow-sm transition"
+                          className="inline-flex items-center px-3 py-1.5 bg-amber-700 hover:bg-amber-800 text-white text-xs font-semibold rounded-full shadow-sm transition"
                         >
                           Add to Journal Issue
                         </button>
@@ -772,7 +772,7 @@ const AdminDashboard = () => {
               <div key={paper.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition">
                 <div className="flex justify-between items-start mb-4">
                   <h3 className="text-lg font-semibold text-gray-900 line-clamp-2">{paper.title}</h3>
-                  <span className="px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                  <span className="px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
                     PENDING ASSIGNMENT
                   </span>
                 </div>
@@ -791,7 +791,7 @@ const AdminDashboard = () => {
                       setSelectedPaper(paper);
                       setShowAssignModal(true);
                     }}
-                    className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition"
+                    className="w-full py-2 px-4 bg-amber-700 hover:bg-amber-800 text-white text-sm font-medium rounded-lg transition"
                   >
                     Assign Reviewer
                   </button>
@@ -810,13 +810,13 @@ const AdminDashboard = () => {
                 value={adminSearchTerm}
                 onChange={(e) => setAdminSearchTerm(e.target.value)}
                 placeholder="Search by title, author, category..."
-                className="w-full md:max-w-md px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                className="w-full md:max-w-md px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-700 focus:border-amber-700 text-sm"
               />
               <div className="flex items-center gap-3">
                 <select
                   value={adminSortBy}
                   onChange={(e) => setAdminSortBy(e.target.value)}
-                  className="px-3 py-2 border border-gray-200 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="px-3 py-2 border border-gray-200 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-amber-700 focus:border-amber-700"
                 >
                   <option value="recent">Newest first</option>
                   <option value="oldest">Oldest first</option>
@@ -861,7 +861,7 @@ const AdminDashboard = () => {
                             setReviewsModalReviews(reviews);
                             setShowReviewsModal(true);
                           }}
-                          className="mt-1 text-blue-600 hover:text-blue-800 text-xs font-medium"
+                          className="mt-1 text-amber-700 hover:text-amber-900 text-xs font-medium"
                         >
                           View all reviews
                         </button>
@@ -971,7 +971,7 @@ const AdminDashboard = () => {
                           {!issue.isCurrent && (
                             <button
                               onClick={() => handleSetCurrentIssue(issue.id)}
-                              className="text-xs bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-1 rounded-md"
+                              className="text-xs bg-amber-100 text-amber-700 hover:bg-amber-200 px-3 py-1 rounded-md"
                             >
                               Set as Current
                             </button>
@@ -1026,7 +1026,7 @@ const AdminDashboard = () => {
                       value={issueForm.volume}
                       onChange={handleIssueFormChange}
                       required
-                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-amber-700 focus:border-amber-700 sm:text-sm"
                       placeholder="e.g., 3"
                     />
                   </div>
@@ -1039,7 +1039,7 @@ const AdminDashboard = () => {
                       value={issueForm.issue}
                       onChange={handleIssueFormChange}
                       required
-                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-amber-700 focus:border-amber-700 sm:text-sm"
                       placeholder="e.g., 4"
                     />
                   </div>
@@ -1052,7 +1052,7 @@ const AdminDashboard = () => {
                       value={issueForm.month}
                       onChange={handleIssueFormChange}
                       required
-                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-amber-700 focus:border-amber-700 sm:text-sm"
                       placeholder="e.g., December"
                     />
                   </div>
@@ -1065,13 +1065,13 @@ const AdminDashboard = () => {
                       value={issueForm.year}
                       onChange={handleIssueFormChange}
                       required
-                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-amber-700 focus:border-amber-700 sm:text-sm"
                       placeholder="e.g., 2025"
                     />
                   </div>
                   <button
                     type="submit"
-                    className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition"
+                    className="w-full py-2 px-4 bg-amber-700 hover:bg-amber-800 text-white font-medium rounded-lg transition"
                   >
                     Add Issue
                   </button>
@@ -1135,7 +1135,7 @@ const AdminDashboard = () => {
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         placeholder="Search by name, email, or affiliation..."
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-700 focus:border-amber-700 pr-10"
                       />
                       <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none mt-5 sm:mt-0">
                         <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1149,7 +1149,7 @@ const AdminDashboard = () => {
                       <select
                         value={reviewerSortBy}
                         onChange={(e) => setReviewerSortBy(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-amber-700 focus:border-amber-700"
                       >
                         <option value="name_az">Name A-Z</option>
                         <option value="name_za">Name Z-A</option>
@@ -1201,7 +1201,7 @@ const AdminDashboard = () => {
                   <button
                     onClick={handleAssignReviewer}
                     disabled={assigning || !selectedReviewer}
-                    className="flex-1 py-2 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white text-sm font-medium rounded-lg transition flex items-center justify-center"
+                    className="flex-1 py-2 px-4 bg-amber-700 hover:bg-amber-800 disabled:bg-amber-500 text-white text-sm font-medium rounded-lg transition flex items-center justify-center"
                   >
                     {assigning ? 'Assigning...' : 'Assign Reviewer'}
                   </button>
@@ -1330,7 +1330,7 @@ const AdminDashboard = () => {
                     value={revisionNote}
                     onChange={(e) => setRevisionNote(e.target.value)}
                     rows={5}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm resize-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-700 focus:border-amber-700 text-sm resize-none"
                     placeholder="Describe the requested revisions..."
                   />
                 </div>
@@ -1475,7 +1475,7 @@ const AdminDashboard = () => {
                     type="button"
                     onClick={handleAssignPaperToIssue}
                     disabled={assignIssueSubmitting || !selectedIssueId}
-                    className="flex-1 py-2 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white text-sm font-medium rounded-lg transition"
+                    className="flex-1 py-2 px-4 bg-amber-700 hover:bg-amber-800 disabled:bg-amber-500 text-white text-sm font-medium rounded-lg transition"
                   >
                     {assignIssueSubmitting ? 'Assigning...' : 'Assign to Issue'}
                   </button>

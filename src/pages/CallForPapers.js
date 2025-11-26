@@ -43,7 +43,7 @@ const CallForPapers = () => {
                 'Opportunities for academic recognition and collaboration'
               ].map((item, i) => (
                 <li key={i} className="flex items-start">
-                  <span className="text-blue-500 mr-2 mt-0.5">✓</span>
+                  <span className="text-amber-700 mr-2 mt-0.5">✓</span>
                   <span>{item}</span>
                 </li>
               ))}
@@ -56,7 +56,7 @@ const CallForPapers = () => {
             <ul className="space-y-2 text-gray-700">
               <li>
                 • Authors are requested to submit their manuscripts in accordance with the journal’s formatting guidelines, available on the{' '}
-                <Link to="/author-guidelines" className="text-blue-500 hover:underline">
+                <Link to="/author-guidelines" className="text-amber-700 hover:underline">
                   Author Guidelines
                 </Link>{' '}
                 page.
@@ -64,11 +64,11 @@ const CallForPapers = () => {
               <li>• Submissions should be original, unpublished, and not under consideration elsewhere.</li>
               <li>
                 • Manuscripts can be submitted online via our{' '}
-                <Link to="/SubmitForm" className="text-blue-500 hover:underline">
+                <Link to="/SubmitForm" className="text-amber-700 hover:underline">
                   Online Submission System
                 </Link>{' '}
                 or by email to{' '}
-                <a href="mailto:editor@ijepa.org" className="text-blue-500 hover:underline">
+                <a href="mailto:editor@ijepa.org" className="text-amber-700 hover:underline">
                   editor@ijepa.org
                 </a>
                 .
@@ -103,7 +103,7 @@ const CallForPapers = () => {
               ].map(([label, date], i) => (
                 <div key={i} className="bg-slate-50 border border-slate-200 rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition-shadow">
                   <p className="font-semibold text-slate-800">{label}</p>
-                  <p className="text-blue-600 font-bold text-lg mt-2">
+                  <p className="text-amber-700 font-bold text-lg mt-2">
                     {date}
                   </p>
                 </div>
@@ -115,7 +115,7 @@ const CallForPapers = () => {
           <div className="text-center mt-6">
             <Link
               to="/SubmitForm"
-              className="inline-block bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-8 rounded-lg transition-colors duration-200"
+              className="inline-block bg-amber-700 hover:bg-amber-800 text-white font-medium py-3 px-8 rounded-lg transition-colors duration-200"
             >
               Submit Your Manuscript
             </Link>

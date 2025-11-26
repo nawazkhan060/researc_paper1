@@ -47,13 +47,13 @@ const ContactUs = () => {
         {/* Hero Section */}
         <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white py-20">
           <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-pulse"></div>
-            <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-pulse animation-delay-2000"></div>
+            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-amber-600 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-pulse"></div>
+            <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-amber-400 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-pulse animation-delay-2000"></div>
           </div>
           
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h1 className="text-4xl md:text-5xl font-bold mb-6">
-              Contact <span className="text-indigo-300">Us</span>
+              Contact <span className="text-amber-200">Us</span>
             </h1>
             <p className="text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed">
               We're here to assist you with any questions about submissions, editorial policies, or journal operations.
@@ -75,7 +75,7 @@ const ContactUs = () => {
               {/* Editorial Office */}
               <div className="mb-10">
                 <h3 className="text-xl font-bold text-slate-900 mb-4 flex items-center">
-                  <svg className="w-5 h-5 text-indigo-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-amber-700 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2M7 21h10" />
                   </svg>
                   Editorial Office
@@ -107,7 +107,7 @@ const ContactUs = () => {
               <div className="space-y-6">
                 <div>
                   <h3 className="text-lg font-bold text-slate-900 mb-3 flex items-center">
-                    <svg className="w-4 h-4 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 text-amber-700 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                     </svg>
                     For Authors
@@ -146,8 +146,8 @@ const ContactUs = () => {
                 </div>
               </div>
 
-              <div className="mt-8 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <p className="text-blue-800 font-medium">
+              <div className="mt-8 p-4 bg-amber-50 rounded-lg border border-amber-200">
+                <p className="text-amber-800 font-medium">
                   We aim to respond to all inquiries within <strong>2–3 business days</strong>.
                 </p>
               </div>
@@ -191,7 +191,7 @@ const ContactUs = () => {
                     value={formData.name}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-700 focus:border-amber-700 transition-colors"
                     placeholder="Enter your full name"
                   />
                 </div>
@@ -239,7 +239,7 @@ const ContactUs = () => {
                     onChange={handleChange}
                     required
                     rows="6"
-                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors resize-none"
+                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-700 focus:border-amber-700 transition-colors resize-none"
                     placeholder="Please provide details about your inquiry.."
                   />
                 </div>
@@ -247,7 +247,7 @@ const ContactUs = () => {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full py-3 px-6 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center"
+                  className="w-full py-3 px-6 bg-amber-700 hover:bg-amber-800 disabled:bg-amber-500 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center"
                 >
                   {isSubmitting ? (
                     <span className="flex items-center">

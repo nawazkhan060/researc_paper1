@@ -184,13 +184,13 @@ const JournalIssues = () => {
         {/* Hero Section */}
         <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white py-20">
           <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-pulse"></div>
-            <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-pulse animation-delay-2000"></div>
+            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-amber-600 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-pulse"></div>
+            <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-amber-400 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-pulse animation-delay-2000"></div>
           </div>
           
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h1 className="text-4xl md:text-5xl font-bold mb-6">
-              Journal <span className="text-indigo-300">Issues</span>
+              Journal <span className="text-amber-200">Issues</span>
             </h1>
             <p className="text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed">
               Explore current and archived issues of IJEPA featuring peer-reviewed research across engineering disciplines.
@@ -210,8 +210,8 @@ const JournalIssues = () => {
           {/* Current Issue - Single Card */}
           <section className="mb-20">
             <div className="flex items-center mb-8">
-              <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center mr-4">
-                <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center mr-4">
+                <svg className="w-6 h-6 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
@@ -283,7 +283,7 @@ const JournalIssues = () => {
                             <span>
                               Issue {issue.issue}, {issue.year}
                             </span>
-                            <span className="text-xs text-indigo-600">
+                            <span className="text-xs text-amber-700">
                               {expandedIssueId === issue.id ? 'Hide Articles' : 'View Articles'}
                             </span>
                           </h4>
@@ -301,7 +301,7 @@ const JournalIssues = () => {
                                       href={paper.pdfUrl || '#'}
                                       target="_blank"
                                       rel="noopener noreferrer"
-                                      className="font-semibold text-indigo-700 hover:text-indigo-900 hover:underline"
+                                      className="font-semibold text-amber-800 hover:text-amber-900 hover:underline"
                                     >
                                       {paper.title}
                                     </a>
@@ -355,13 +355,13 @@ const JournalIssues = () => {
           </section>
 
           {/* Call to Action */}
-          <div className="text-center py-10 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl border border-indigo-100">
+          <div className="text-center py-10 bg-gradient-to-r from-amber-50 to-amber-100 rounded-2xl border border-amber-100">
             <p className="text-lg text-slate-700 mb-4">
               To publish in upcoming issues, please visit our Call for Papers page.
             </p>
             <a
               href="/call-for-papers"
-              className="inline-flex items-center px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow-md hover:shadow-lg transition-all duration-300"
+              className="inline-flex items-center px-6 py-3 bg-amber-700 hover:bg-amber-800 text-white font-semibold rounded-xl shadow-md hover:shadow-lg transition-all duration-300"
             >
               Call for Papers
               <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

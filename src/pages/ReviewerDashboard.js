@@ -234,8 +234,8 @@ const ReviewerDashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
           <div className="bg-white rounded-xl shadow-sm border border-academic-200 p-6 transition-all duration-300 hover:shadow-md">
             <div className="flex items-center">
-              <div className="p-3 bg-blue-50 rounded-xl">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <div className="p-3 bg-amber-50 rounded-xl">
+                <svg className="w-6 h-6 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                 </svg>
               </div>
@@ -283,7 +283,7 @@ const ReviewerDashboard = () => {
                 onClick={() => setActiveTab('assigned')}
                 className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
                   activeTab === 'assigned'
-                    ? 'border-primary-500 text-primary-600'
+                    ? 'border-amber-700 text-amber-700'
                     : 'border-transparent text-academic-500 hover:text-academic-700 hover:border-academic-300'
                 }`}
               >
@@ -293,7 +293,7 @@ const ReviewerDashboard = () => {
                 onClick={() => setActiveTab('completed')}
                 className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
                   activeTab === 'completed'
-                    ? 'border-primary-500 text-primary-600'
+                    ? 'border-amber-700 text-amber-700'
                     : 'border-transparent text-academic-500 hover:text-academic-700 hover:border-academic-300'
                 }`}
               >
@@ -312,13 +312,13 @@ const ReviewerDashboard = () => {
                 value={reviewerSearchTerm}
                 onChange={(e) => setReviewerSearchTerm(e.target.value)}
                 placeholder="Search by title, author, category..."
-                className="w-full md:max-w-md px-4 py-2 border border-academic-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
+                className="w-full md:max-w-md px-4 py-2 border border-academic-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-700 focus:border-amber-700 text-sm"
               />
               <div className="flex items-center gap-3">
                 <select
                   value={reviewerSortBy}
                   onChange={(e) => setReviewerSortBy(e.target.value)}
-                  className="px-3 py-2 border border-academic-200 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="px-3 py-2 border border-academic-200 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-amber-700 focus:border-amber-700"
                 >
                   <option value="recent">Newest first</option>
                   <option value="oldest">Oldest first</option>
@@ -597,7 +597,7 @@ const ReviewerDashboard = () => {
                       name="rating"
                       value={reviewFormData.rating}
                       onChange={handleReviewFormChange}
-                      className="w-full px-4 py-3 border border-academic-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200"
+                      className="w-full px-4 py-3 border border-academic-300 rounded-lg focus:ring-2 focus:ring-amber-700 focus:border-amber-700 transition-colors duration-200"
                       required
                     >
                       <option value="">Select a rating</option>
@@ -615,7 +615,7 @@ const ReviewerDashboard = () => {
                       name="recommendation"
                       value={reviewFormData.recommendation}
                       onChange={handleReviewFormChange}
-                      className="w-full px-4 py-3 border border-academic-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200"
+                      className="w-full px-4 py-3 border border-academic-300 rounded-lg focus:ring-2 focus:ring-amber-700 focus:border-amber-700 transition-colors duration-200"
                       required
                     >
                       <option value="">Select a recommendation</option>

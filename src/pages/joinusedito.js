@@ -64,19 +64,19 @@ const JoinEditorialTeam = () => {
           <h2 className="text-xl font-semibold text-gray-800 mb-4">Benefits</h2>
           <ul className="grid grid-cols-1 md:grid-cols-2 gap-3 text-gray-700">
             <li className="flex items-start">
-              <span className="text-blue-500 mr-2 mt-0.5">✓</span>
+              <span className="text-amber-700 mr-2 mt-0.5">✓</span>
               <span>Recognition as an Associate Editor/Reviewer on the IJEPA website.</span>
             </li>
             <li className="flex items-start">
-              <span className="text-blue-500 mr-2 mt-0.5">✓</span>
+              <span className="text-amber-700 mr-2 mt-0.5">✓</span>
               <span>Opportunity to stay updated with cutting-edge research in your field.</span>
             </li>
             <li className="flex items-start">
-              <span className="text-blue-500 mr-2 mt-0.5">✓</span>
+              <span className="text-amber-700 mr-2 mt-0.5">✓</span>
               <span>Certificate of appreciation for your editorial/reviewing contribution.</span>
             </li>
             <li className="flex items-start">
-              <span className="text-blue-500 mr-2 mt-0.5">✓</span>
+              <span className="text-amber-700 mr-2 mt-0.5">✓</span>
               <span>Networking with international researchers and professionals.</span>
             </li>
           </ul>
@@ -92,7 +92,7 @@ const JoinEditorialTeam = () => {
             href={GOOGLE_FORM_LINK}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors duration-200"
+            className="inline-flex items-center px-6 py-3 bg-amber-700 hover:bg-amber-800 text-white font-medium rounded-lg transition-colors duration-200"
           >
             👉 Apply Here
           </a>
@@ -101,7 +101,7 @@ const JoinEditorialTeam = () => {
             <span className="font-medium">Editorial Office, IJEPA</span><br />
             Email: <a
               href={`mailto:${JOURNAL_EMAIL}`}
-              className="text-blue-500 hover:underline"
+              className="text-amber-700 hover:underline"
             >
               {JOURNAL_EMAIL}
             </a>

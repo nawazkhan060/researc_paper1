@@ -114,7 +114,7 @@ const Register = () => {
           Or{' '}
           <Link
             to="/login"
-            className="font-medium text-primary-600 hover:text-primary-500"
+            className="font-medium text-amber-700 hover:text-amber-800"
           >
             sign in to your existing account
           </Link>
@@ -248,15 +248,15 @@ const Register = () => {
                 name="terms"
                 type="checkbox"
                 required
-                className="h-4 w-4 text-primary-600 border-academic-300 rounded"
+                className="h-4 w-4 text-amber-700 border-academic-300 rounded"
               />
               <label htmlFor="terms" className="ml-2 block text-sm text-academic-900">
                 I agree to the{' '}
-                <a href="#" className="text-primary-600 hover:text-primary-500">
+                <a href="#" className="text-amber-700 hover:text-amber-800">
                   Terms of Service
                 </a>{' '}
                 and{' '}
-                <a href="#" className="text-primary-600 hover:text-primary-500">
+                <a href="#" className="text-amber-700 hover:text-amber-800">
                   Privacy Policy
                 </a>
               </label>
@@ -266,22 +266,15 @@ const Register = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="button-auth w-full justify-center"
+                className="button w-full justify-center"
               >
                 {loading ? (
-                  <span className="flex items-center justify-center">
-                    <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></span>
-                    <span className="text_button">Creating Account...</span>
-                  </span>
+                  <p className="flex items-center justify-center gap-2 text-sm">
+                    <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
+                    <span>Creating Account...</span>
+                  </p>
                 ) : (
-                  <>
-                    <span className="dots_border"></span>
-                    <svg className="sparkle" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path className="path" d="M14.8285 14.8285C16.105 13.552 16.105 11.448 14.8285 10.1716C13.552 8.89502 11.448 8.89502 10.1716 10.1716C8.89502 11.448 8.89502 13.552 10.1716 14.8285C11.448 16.105 13.552 16.105 14.8285 14.8285Z" />
-                      <path className="path" d="M12 2V4M12 20V22M4 12H2M22 12H20M19.071 19.071L17.657 17.657M6.343 6.343L4.929 4.929M19.071 4.929L17.657 6.343M6.343 17.657L4.929 19.071" />
-                    </svg>
-                    <span className="text_button">Create Account</span>
-                  </>
+                  <p>Create Account</p>
                 )}
               </button>
             </div>
@@ -303,7 +296,7 @@ const Register = () => {
               <button
                 type="button"
                 onClick={handleGoogleLogin}
-                className="w-full flex justify-center items-center gap-3 py-2 px-4 border border-academic-300 rounded-md shadow-sm bg-white text-sm font-medium text-academic-700 hover:bg-academic-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                className="w-full flex justify-center items-center gap-3 py-2 px-4 border border-academic-300 rounded-md shadow-sm bg-white text-sm font-medium text-academic-700 hover:bg-academic-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-700"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path
