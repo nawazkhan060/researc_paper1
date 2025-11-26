@@ -3,21 +3,21 @@ import logo from '../assets/logo.png';
 
 const Footer = () => {
   return (
-    <footer className="bg-academic-800 text-white">
+    <footer className="bg-amber-700 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Logo and Description */}
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center space-x-3 mb-6">
-              <img 
+              <img
                 src={logo}
-                alt="IJEPA Logo" 
+                alt="IJEPA Logo"
                 className="h-10 w-auto"
               />
               <span className="text-2xl font-bold tracking-tight">IJEPA</span>
             </div>
             <p className="text-academic-300 text-base leading-relaxed max-w-md">
-              The International Journal of Engineering Practices and Applications – 
+              The International Journal of Engineering Practices and Applications –
               advancing research, innovation, and practical applications in engineering.
             </p>
           </div>
@@ -29,8 +29,8 @@ const Footer = () => {
             <h3 className="text-lg font-semibold mb-5 pb-2 border-b border-academic-700">Contact</h3>
             <ul className="space-y-3">
               <li>
-                <a 
-                  href="/contact-us" 
+                <a
+                  href="/contact-us"
                   className="inline-flex items-center text-academic-300 hover:text-white transition-colors text-base"
                 >
                   <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

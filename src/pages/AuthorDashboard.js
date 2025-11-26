@@ -14,7 +14,7 @@ const AuthorDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [notifications, setNotifications] = useState([]);
   const [notificationsLoading, setNotificationsLoading] = useState(true);
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const [showNotificationsModal, setShowNotificationsModal] = useState(false);
   const [authorSearchTerm, setAuthorSearchTerm] = useState('');
   const [authorSortBy, setAuthorSortBy] = useState('recent');
@@ -44,7 +44,7 @@ const AuthorDashboard = () => {
     try {
       setLoading(true);
       const allPapers = await mockAPI.getAllPapers();
-      const authorPapers = allPapers.filter(paper => 
+      const authorPapers = allPapers.filter(paper =>
         paper.authors.some(author => author.includes(user.name.split(' ')[0]))
       );
       setPapers(authorPapers);
@@ -141,18 +141,91 @@ const AuthorDashboard = () => {
     }
   };
 
+  const loadRazorpay = () => {
+    return new Promise((resolve) => {
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.onload = () => {
+        resolve(true);
+      };
+      script.onerror = () => {
+        resolve(false);
+      };
+      document.body.appendChild(script);
+    });
+  };
+
   const handlePayment = async (paperId) => {
+    const res = await loadRazorpay();
+
+    if (!res) {
+      setAlert({ type: 'error', message: 'Razorpay SDK failed to load. Are you online?' });
+      return;
+    }
+
     try {
       const paper = papers.find(p => p.id === paperId);
-      if (paper) {
-        paper.paymentStatus = 'paid';
-        setAlert({ type: 'success', message: 'Payment processed successfully!' });
-        loadAuthorPapers();
+      if (!paper) return;
+
+      const key = await mockAPI.getRazorpayKey();
+      if (!key) {
+        setAlert({ type: 'error', message: 'Failed to load payment configuration.' });
+        return;
       }
+
+      const result = await mockAPI.createPaymentOrder(paperId, 150);
+
+      if (!result.success) {
+        setAlert({ type: 'error', message: result.error || 'Failed to initiate payment.' });
+        return;
+      }
+
+      const { amount, id: order_id, currency } = result.order;
+
+      const options = {
+        key: key,
+        amount: amount.toString(),
+        currency: currency,
+        name: "Research Paper Submission",
+        description: `Submission Fee for ${paper.title}`,
+        order_id: order_id,
+        handler: async function (response) {
+          const data = {
+            orderCreationId: order_id,
+            razorpayPaymentId: response.razorpay_payment_id,
+            razorpayOrderId: response.razorpay_order_id,
+            razorpaySignature: response.razorpay_signature,
+            paperId: paperId
+          };
+
+          const verifyResult = await mockAPI.verifyPayment(data);
+
+          if (verifyResult.success) {
+            setAlert({ type: 'success', message: 'Payment processed successfully!' });
+            loadAuthorPapers();
+          } else {
+            setAlert({ type: 'error', message: verifyResult.error || 'Payment verification failed.' });
+          }
+        },
+        prefill: {
+          name: user.name,
+          email: user.email,
+          contact: "",
+        },
+        theme: {
+          color: "#b45309",
+        },
+      };
+
+      const paymentObject = new window.Razorpay(options);
+      paymentObject.open();
+
     } catch (error) {
+      console.error(error);
       setAlert({ type: 'error', message: 'Payment failed. Please try again.' });
     }
   };
+
 
   const handleRevisionFileChange = (e) => {
     const file = e.target.files && e.target.files[0] ? e.target.files[0] : null;
@@ -284,10 +357,10 @@ const AuthorDashboard = () => {
         {/* Alert */}
         {alert && (
           <div className="mb-8">
-            <Alert 
-              type={alert.type} 
-              message={alert.message} 
-              onClose={() => setAlert(null)} 
+            <Alert
+              type={alert.type}
+              message={alert.message}
+              onClose={() => setAlert(null)}
             />
           </div>
         )}
@@ -317,11 +390,10 @@ const AuthorDashboard = () => {
                       <div
                         key={notification.id}
                         onClick={() => handleNotificationClick(notification.id)}
-                        className={`p-3 rounded-lg border text-sm cursor-pointer transition-colors duration-200 ${
-                          notification.read
-                            ? 'bg-academic-50 border-academic-100 text-academic-600'
-                            : 'bg-white border-amber-100 text-academic-700 hover:bg-amber-50'
-                        }`}
+                        className={`p-3 rounded-lg border text-sm cursor-pointer transition-colors duration-200 ${notification.read
+                          ? 'bg-academic-50 border-academic-100 text-academic-600'
+                          : 'bg-white border-amber-100 text-academic-700 hover:bg-amber-50'
+                          }`}
                       >
                         <div className="flex items-start justify-between gap-3">
                           <div>
@@ -422,7 +494,7 @@ const AuthorDashboard = () => {
         {/* Action Buttons */}
         <div className="mb-10">
           <button
-            onClick={() => navigate('/submitform')} 
+            onClick={() => navigate('/submitform')}
             className="btn-glow"
           >
             <strong>Submit New Paper</strong>
@@ -621,21 +693,19 @@ const AuthorDashboard = () => {
             <nav className="-mb-px flex space-x-8">
               <button
                 onClick={() => setActiveTab('submissions')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
-                  activeTab === 'submissions'
-                    ? 'border-amber-500 text-amber-600'
-                    : 'border-transparent text-academic-500 hover:text-academic-700 hover:border-academic-300'
-                }`}
+                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${activeTab === 'submissions'
+                  ? 'border-amber-500 text-amber-600'
+                  : 'border-transparent text-academic-500 hover:text-academic-700 hover:border-academic-300'
+                  }`}
               >
                 All Submissions ({papers.length})
               </button>
               <button
                 onClick={() => setActiveTab('pending')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
-                  activeTab === 'pending'
-                    ? 'border-amber-500 text-amber-600'
-                    : 'border-transparent text-academic-500 hover:text-academic-700 hover:border-academic-300'
-                }`}
+                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${activeTab === 'pending'
+                  ? 'border-amber-500 text-amber-600'
+                  : 'border-transparent text-academic-500 hover:text-academic-700 hover:border-academic-300'
+                  }`}
               >
                 Pending Payment ({stats.submitted})
               </button>
@@ -682,12 +752,11 @@ const AuthorDashboard = () => {
                     <h3 className="text-lg font-semibold text-academic-900 line-clamp-2 leading-tight">
                       {paper.title}
                     </h3>
-                    <span className={`${
-                      paper.status === 'published' ? 'badge-success' :
+                    <span className={`${paper.status === 'published' ? 'badge-success' :
                       paper.status === 'under_review' ? 'badge-warning' :
-                      paper.status === 'submitted' ? 'badge-info' :
-                      'badge-danger'
-                    }`}>
+                        paper.status === 'submitted' ? 'badge-info' :
+                          'badge-danger'
+                      }`}>
                       {paper.status.replace('_', ' ').toUpperCase()}
                     </span>
                   </div>
@@ -697,7 +766,7 @@ const AuthorDashboard = () => {
                       <span className="font-medium text-academic-700 text-sm w-20">Authors:</span>
                       <span className="text-sm text-academic-600">{paper.authors.join(', ')}</span>
                     </div>
-                    
+
                     <div className="flex items-center">
                       <span className="font-medium text-academic-700 text-sm w-20">Submitted:</span>
                       <span className="text-sm text-academic-600">{new Date(paper.submissionDate).toLocaleDateString()}</span>
@@ -743,8 +812,8 @@ const AuthorDashboard = () => {
                           className="Btn"
                         >
                           <svg className="svgIcon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M2 6L12 13L22 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M2 6L12 13L22 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                           </svg>
                           Pay Now
                         </button>
@@ -868,8 +937,8 @@ const AuthorDashboard = () => {
                     className="Btn"
                   >
                     <svg className="svgIcon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                      <path d="M2 6L12 13L22 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                      <path d="M2 6L12 13L22 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
                     Pay Now
                   </button>

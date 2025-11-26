@@ -386,96 +386,96 @@ export const mockAPI = {
     }
   },
 
-setCurrentIssue: async (issueId) => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/issues/${issueId}/set-current`, {
-      method: 'POST',
-    });
-    const data = await response.json();
+  setCurrentIssue: async (issueId) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/issues/${issueId}/set-current`, {
+        method: 'POST',
+      });
+      const data = await response.json();
 
-    if (!data.success || !data.issue) {
-      return { success: false, error: data.error || 'Failed to update current issue.' };
+      if (!data.success || !data.issue) {
+        return { success: false, error: data.error || 'Failed to update current issue.' };
+      }
+
+      return { success: true, issue: data.issue };
+    } catch (error) {
+      console.error('setCurrentIssue error', error);
+      return { success: false, error: 'Failed to update current issue.' };
     }
+  },
 
-    return { success: true, issue: data.issue };
-  } catch (error) {
-    console.error('setCurrentIssue error', error);
-    return { success: false, error: 'Failed to update current issue.' };
-  }
-},
+  deleteIssue: async (issueId) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/issues/${issueId}`, {
+        method: 'DELETE',
+      });
+      const data = await response.json();
 
-deleteIssue: async (issueId) => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/issues/${issueId}`, {
-      method: 'DELETE',
-    });
-    const data = await response.json();
+      if (!data.success) {
+        return { success: false, error: data.error || 'Failed to delete issue.' };
+      }
 
-    if (!data.success) {
-      return { success: false, error: data.error || 'Failed to delete issue.' };
+      return { success: true };
+    } catch (error) {
+      console.error('deleteIssue error', error);
+      return { success: false, error: 'Failed to delete issue.' };
     }
+  },
 
-    return { success: true };
-  } catch (error) {
-    console.error('deleteIssue error', error);
-    return { success: false, error: 'Failed to delete issue.' };
-  }
-},
+  assignPaperToIssue: async (paperId, issueId) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/issues/${issueId}/assign-paper`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paperId }),
+      });
+      const data = await response.json();
 
-assignPaperToIssue: async (paperId, issueId) => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/issues/${issueId}/assign-paper`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ paperId }),
-    });
-    const data = await response.json();
+      if (!data.success) {
+        return { success: false, error: data.error || 'Failed to assign paper to issue.' };
+      }
 
-    if (!data.success) {
-      return { success: false, error: data.error || 'Failed to assign paper to issue.' };
+      return { success: true };
+    } catch (error) {
+      console.error('assignPaperToIssue error', error);
+      return { success: false, error: 'Failed to assign paper to issue.' };
     }
+  },
 
-    return { success: true };
-  } catch (error) {
-    console.error('assignPaperToIssue error', error);
-    return { success: false, error: 'Failed to assign paper to issue.' };
-  }
-},
+  unassignPaperFromIssue: async (paperId, issueId) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/issues/${issueId}/assign-paper/${paperId}`, {
+        method: 'DELETE',
+      });
+      const data = await response.json();
 
-unassignPaperFromIssue: async (paperId, issueId) => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/issues/${issueId}/assign-paper/${paperId}`, {
-      method: 'DELETE',
-    });
-    const data = await response.json();
+      if (!data.success) {
+        return { success: false, error: data.error || 'Failed to unassign paper from issue.' };
+      }
 
-    if (!data.success) {
-      return { success: false, error: data.error || 'Failed to unassign paper from issue.' };
+      return { success: true };
+    } catch (error) {
+      console.error('unassignPaperFromIssue error', error);
+      return { success: false, error: 'Failed to unassign paper from issue.' };
     }
+  },
 
-    return { success: true };
-  } catch (error) {
-    console.error('unassignPaperFromIssue error', error);
-    return { success: false, error: 'Failed to unassign paper from issue.' };
-  }
-},
+  // Notifications
+  getNotifications: async (userId) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/notifications?userId=${userId}`);
+      const data = await response.json();
 
-// Notifications
-getNotifications: async (userId) => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/notifications?userId=${userId}`);
-    const data = await response.json();
+      if (!data.success || !Array.isArray(data.notifications)) {
+        return [];
+      }
 
-    if (!data.success || !Array.isArray(data.notifications)) {
+      return data.notifications;
+    } catch (error) {
+      console.error('getNotifications error', error);
       return [];
     }
-
-    return data.notifications;
-  } catch (error) {
-    console.error('getNotifications error', error);
-    return [];
-  }
-},
+  },
 
   markNotificationRead: async (notificationId) => {
     try {
@@ -510,6 +510,58 @@ getNotifications: async (userId) => {
     } catch (error) {
       console.error('deleteNotification error', error);
       return { success: false };
+    }
+  },
+
+  // Payments
+  createPaymentOrder: async (paperId, amount) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/payments/create-order`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paperId, amount })
+      });
+      const data = await response.json();
+
+      if (!data.success || !data.order) {
+        return { success: false, error: data.error || 'Failed to create payment order.' };
+      }
+
+      return { success: true, order: data.order };
+    } catch (error) {
+      console.error('createPaymentOrder error', error);
+      return { success: false, error: 'Failed to create payment order.' };
+    }
+  },
+
+  verifyPayment: async (paymentData) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/payments/verify-payment`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(paymentData)
+      });
+      const data = await response.json();
+
+      if (!data.success) {
+        return { success: false, error: data.message || 'Payment verification failed.' };
+      }
+
+      return { success: true };
+    } catch (error) {
+      console.error('verifyPayment error', error);
+      return { success: false, error: 'Payment verification failed.' };
+    }
+  },
+
+  getRazorpayKey: async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/payments/key`);
+      const data = await response.json();
+      return data.key;
+    } catch (error) {
+      console.error('getRazorpayKey error', error);
+      return null;
     }
   }
 };

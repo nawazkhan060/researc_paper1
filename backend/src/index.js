@@ -12,6 +12,7 @@ const adminRoutes = require('./routes/admin');
 const notificationsRoutes = require('./routes/notifications');
 const submissionsRoutes = require('./routes/submissions');
 const issuesRoutes = require('./routes/issues');
+const paymentsRoutes = require('./routes/payments');
 
 const app = express();
 
@@ -43,6 +44,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/notifications', notificationsRoutes);
 app.use('/api/submissions', submissionsRoutes);
 app.use('/api/issues', issuesRoutes);
+app.use('/api/payments', paymentsRoutes);
 
 app.listen(PORT, () => {
   console.log(`Backend API listening on port ${PORT}`);
