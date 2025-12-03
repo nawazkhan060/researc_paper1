@@ -29,6 +29,8 @@ const Landing = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Scroll fade effect is currently disabled to avoid any chance of content staying hidden.
+
   const loadPublishedPapers = async () => {
     try {
       setLoading(true);
@@ -48,10 +50,10 @@ const Landing = () => {
     if (searchTerm) {
       filtered = filtered.filter(paper =>
         paper.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        paper.authors.some(author => 
+        paper.authors.some(author =>
           author.toLowerCase().includes(searchTerm.toLowerCase())
         ) ||
-        paper.keywords.some(keyword => 
+        paper.keywords.some(keyword =>
           keyword.toLowerCase().includes(searchTerm.toLowerCase())
         )
       );
@@ -90,345 +92,833 @@ const Landing = () => {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
         .landing-page-roboto { font-family: 'Roboto', sans-serif; }
+        /* Keep sections visible by default; fade logic can be re-enabled later if needed */
+        .fade-section { opacity: 1; transform: none; transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
+        .fade-section.is-visible { opacity: 1; transform: none; }
       `}</style>
       <div className="bg-slate-50 landing-page-roboto">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white"
-      style={{
-        backgroundImage: `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url(${hero})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        
-      }}
-      >
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-amber-600 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-pulse"></div>
-          <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-amber-400 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-pulse animation-delay-2000"></div>
-          <div className="absolute bottom-1/4 left-1/3 w-96 h-96 bg-amber-700 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-pulse animation-delay-4000"></div>
-        
-        </div>
-        
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="text-center max-w-4xl mx-auto">
-            <div className="inline-block bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 mb-6 border border-white/20">
-              <span className="text-amber-200 text-sm font-medium">Trusted by 500+ Researchers Worldwide</span>
-            
+        {/* Hero Section - text left, image right */}
+        <section className="bg-slate-50 fade-section">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-20 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Left content */}
+            <div>
+              <div className="inline-block bg-amber-50 rounded-full px-4 py-2 mb-6 border border-amber-100">
+                <span className="text-amber-700 text-sm font-medium">Trusted by 500+ Researchers Worldwide</span>
+              </div>
+
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-6 leading-tight">
+                International Journal of Engineering Practices and Applications
+                <span className="block text-amber-600 mt-2">IJEPA</span>
+              </h1>
+
+              <p className="text-lg md:text-xl text-slate-600 mb-10 leading-relaxed max-w-xl">
+                A seamless platform for authors, reviewers, and editors. Transparent workflows.
+                Trusted by researchers worldwide.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-4">
+                <a
+                  href="/papers"
+                  className="group bg-amber-600 text-white hover:bg-amber-700 font-semibold py-4 px-8 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1"
+                >
+                  Browse Papers...
+                  <span className="ml-2 inline-block transition-transform group-hover:translate-x-1">→</span>
+                </a>
+                <a
+                  href="/register"
+                  className="group border-2 border-amber-600 text-amber-700 hover:bg-amber-50 font-semibold py-4 px-8 rounded-xl transition-all duration-300 hover:-translate-y-1"
+                >
+                  Join Our Platform
+                </a>
+              </div>
             </div>
-            
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
-              Publish Your Research with
-              <span className="block bg-gradient-to-r from-amber-500 to-amber-700 bg-clip-text text-transparent">IJEPA</span>
-            
-            </h1>
-            
-            <p className="text-xl md:text-2xl text-white mb-10 leading-relaxed max-w-3xl mx-auto">
-              A seamless platform for authors, reviewers, and editors. Transparent workflows. 
-              Trusted by researchers worldwide.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+
+            {/* Right image */}
+            <div className="relative">
+              <div className="rounded-3xl overflow-hidden shadow-2xl">
+                <img
+                  src={hero}
+                  alt="Researchers collaborating on publications"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Latest updates ticker */}
+          <div className="bg-slate-900 text-white text-sm">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col md:flex-row items-center gap-3">
+              <div className="flex items-center gap-2">
+                <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-emerald-500">
+                  <svg
+                    className="w-4 h-4"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M3 12h18" />
+                    <path d="M8 8l-5 4 5 4" />
+                  </svg>
+                </span>
+                <span className="font-semibold tracking-wide uppercase text-xs">
+                  Latest Updates
+                </span>
+              </div>
+              <p className="text-slate-100 md:ml-6 text-center md:text-left">
+                The DOI number is available upon request. Kindly write to editor@ijepa.org for details.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* About IJEPA - two-column layout */}
+        <section className="bg-gradient-to-br from-slate-50 to-white py-24 border-t border-slate-200 fade-section">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="mb-16 max-w-3xl">
+              <h2 className="text-4xl font-bold text-slate-900 mb-6 text-left">
+                About <span className="text-amber-700">IJEPA</span>
+              </h2>
+              <div className="w-24 h-1 bg-amber-700 rounded-full"></div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+              {/* Illustrative images column */}
+              <div className="relative grid grid-cols-2 gap-4">
+                <div className="rounded-3xl bg-white shadow-xl border border-slate-200 overflow-hidden col-span-2 lg:col-span-1">
+                  <img
+                    src={hero}
+                    alt="Researchers collaborating on publications"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="rounded-3xl bg-white shadow-lg border border-slate-200 overflow-hidden mt-6 lg:mt-12">
+                  <img
+                    src={hero}
+                    alt="Editorial and review process illustration"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </div>
+
+              {/* Existing about content */}
+              <div className="prose prose-lg max-w-none text-slate-700 leading-relaxed">
+                <p className="mb-6">
+                  The <strong>International Journal of Engineering Practices and Applications (IJEPA)</strong> is a peer-reviewed, open-access journal dedicated to advancing research, innovation, and practical applications in the field of engineering. Our mission is to serve as a trusted platform for scholars, researchers, practitioners, and industry professionals to share knowledge, exchange ideas, and contribute to the progress of engineering science and technology.
+                </p>
+
+                <p className="mb-6">
+                  IJEPA publishes monthly high-quality original research papers, review articles, and case studies that address theoretical foundations, experimental investigations, and real-world applications across diverse engineering disciplines. We welcome interdisciplinary work that bridges the gap between academic research and industry practices, fostering solutions to contemporary challenges.
+                </p>
+
+                <div className="mt-8 mb-6">
+                  <h3 className="text-2xl font-bold text-slate-900 mb-4 flex items-center">
+                    <span className="w-8 h-8 bg-amber-100 text-amber-800 rounded-lg flex items-center justify-center mr-3">✓</span>
+                    Our Vision
+                  </h3>
+                  <p className="pl-11">
+                    To become a globally recognized journal that drives innovation, disseminates impactful research, and promotes collaboration across engineering domains.
+                  </p>
+                </div>
+
+                <div className="mb-6">
+                  <h3 className="text-2xl font-bold text-slate-900 mb-4 flex items-center">
+                    <span className="w-8 h-8 bg-amber-100 text-amber-800 rounded-lg flex items-center justify-center mr-3">✓</span>
+                    Our Scope
+                  </h3>
+                  <p className="pl-11 mb-4">
+                    IJEPA covers, but is not limited to, the following areas:
+                  </p>
+                  <ul className="pl-11 grid grid-cols-1 md:grid-cols-2 gap-2">
+                    <li className="flex items-start">
+                      <span className="text-amber-700 mr-2">•</span>
+                      <span>Civil, Mechanical, Electrical, and Electronics Engineering</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-amber-700 mr-2">•</span>
+                      <span>Computer Science, Information Technology, and Artificial Intelligence</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-amber-700 mr-2">•</span>
+                      <span>Industrial, Manufacturing, and Materials Engineering</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-amber-700 mr-2">•</span>
+                      <span>Communication, Control, and Instrumentation Systems</span>
+                    </li>
+                    <li className="flex items-start md:col-span-2">
+                      <span className="text-amber-700 mr-2">•</span>
+                      <span>Sustainable, Green, and Emerging Engineering Practices</span>
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="bg-amber-50 rounded-2xl p-6 border border-amber-100">
+                  <h3 className="text-2xl font-bold text-slate-900 mb-4 flex items-center">
+                    <span className="w-8 h-8 bg-amber-100 text-amber-800 rounded-lg flex items-center justify-center mr-3">✓</span>
+                    Why Publish with Us?
+                  </h3>
+                  <ul className="pl-11 space-y-2">
+                    <li className="flex items-start">
+                      <span className="text-green-600 mr-2">✓</span>
+                      <span>Rigorous peer-review process ensuring quality and credibility</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-green-600 mr-2">✓</span>
+                      <span>Open-access policy for maximum visibility and global reach</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-green-600 mr-2">✓</span>
+                      <span>Fast and efficient review and publication cycle</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-green-600 mr-2">✓</span>
+                      <span>Support for young researchers and academics worldwide</span>
+                    </li>
+                  </ul>
+                </div>
+
+                <p className="mt-8 text-lg italic text-slate-600">
+                  "At IJEPA, we believe that engineering is not just about knowledge creation but also about meaningful application.
+                  By connecting research with practice, we aim to contribute to technological growth and societal development."
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Call for Papers Section */}
+        <section className="bg-slate-50 border-t border-slate-200 py-24 fade-section">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="mb-12 max-w-3xl">
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4 text-left">
+                Call for Papers
+              </h2>
+              <p className="text-slate-600 text-sm md:text-base">
+                The International Journal of Engineering Practices and Applications (IJEPA) invites researchers,
+                academicians, industry professionals, and practitioners to submit high-quality research articles,
+                review papers, case studies, and technical notes for upcoming issues.
+              </p>
+              <p className="text-slate-600 text-sm md:text-base">
+                We welcome interdisciplinary work that bridges theoretical advances with practical engineering
+                applications and addresses real-world challenges.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+              <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                <h3 className="text-lg font-semibold text-slate-900 mb-3">Scope Highlights</h3>
+                <ul className="text-sm text-slate-600 space-y-2">
+                  <li>• Civil, Mechanical, Electrical, and Electronics Engineering</li>
+                  <li>• Computer Science, Artificial Intelligence, and Information Technology</li>
+                  <li>• Industrial, Manufacturing, and Materials Engineering</li>
+                  <li>• Communication, Signal Processing, and Control Systems</li>
+                  <li>• Renewable Energy, Green Technologies, and Sustainable Engineering</li>
+                  <li>• Emerging and interdisciplinary engineering practices</li>
+                </ul>
+              </div>
+
+              <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                <h3 className="text-lg font-semibold text-slate-900 mb-3">Why Publish with IJEPA?</h3>
+                <ul className="text-sm text-slate-600 space-y-2">
+                  <li>• Peer-reviewed and high-quality publications</li>
+                  <li>• Open access for global visibility and readership</li>
+                  <li>• Rapid and transparent review process</li>
+                  <li>• International editorial and reviewer panel</li>
+                  <li>• Opportunities for academic recognition and collaboration</li>
+                </ul>
+              </div>
+
+              <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                <h3 className="text-lg font-semibold text-slate-900 mb-3">Important Dates (Sample)</h3>
+                <ul className="text-sm text-slate-600 space-y-2 mb-4">
+                  <li>• Manuscript Submission Deadline: [Insert Date]</li>
+                  <li>• Notification of Acceptance: [Insert Date]</li>
+                  <li>• Final Camera-Ready Paper Due: [Insert Date]</li>
+                  <li>• Publication Date: [Insert Date]</li>
+                </ul>
+                <p className="text-xs text-slate-500 mb-4">
+                  Actual dates will be announced on the detailed Call for Papers page.
+                </p>
+                <a
+                  href="/callforpapers"
+                  className="inline-flex items-center justify-center px-5 py-2 rounded-full bg-amber-600 hover:bg-amber-700 text-white text-sm font-semibold w-full text-center"
+                >
+                  View Full Call for Papers
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Author Guidelines Snapshot */}
+        <section className="bg-white border-t border-slate-200 py-20 fade-section">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="mb-10 max-w-3xl">
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4 text-left">
+                Author Guidelines – At a Glance
+              </h2>
+              <p className="text-slate-600 text-sm md:text-base">
+                Before submitting, please ensure your manuscript follows the core requirements below. Full
+                details are available on the Author Guidelines page.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="bg-slate-50 rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                <h3 className="text-lg font-semibold text-slate-900 mb-3">Manuscript Basics</h3>
+                <ul className="text-sm text-slate-600 space-y-2">
+                  <li>• Language: clear, grammatically correct English</li>
+                  <li>• Format: MS Word (DOC/DOCX), not PDF for initial submission</li>
+                  <li>• Length: typically 6–12 pages for research papers</li>
+                  <li>• Structure: Title, Abstract, Keywords, Introduction, Methods, Results, Conclusion, References</li>
+                </ul>
+              </div>
+
+              <div className="bg-slate-50 rounded-2xl border border-slate-200 p-6">
+                <h3 className="text-lg font-semibold text-slate-900 mb-3">Formatting & Ethics</h3>
+                <ul className="text-sm text-slate-600 space-y-2">
+                  <li>• Times New Roman, size 12, single-column, 1.5 line spacing</li>
+                  <li>• Numbered figures, tables, and equations with clear captions</li>
+                  <li>• Consistent reference style (e.g., IEEE / APA / Harvard)</li>
+                  <li>• Original work only; all submissions checked for plagiarism</li>
+                </ul>
+              </div>
+
+              <div className="bg-slate-50 rounded-2xl border border-slate-200 p-6">
+                <h3 className="text-lg font-semibold text-slate-900 mb-3">APC & Policies</h3>
+                <ul className="text-sm text-slate-600 space-y-2 mb-3">
+                  <li>• Indian Authors: INR 1500 per accepted paper</li>
+                  <li>• International Authors: USD 50 per accepted paper</li>
+                  <li>• No submission fee; charges apply only after acceptance</li>
+                  <li>• Double-blind peer review and strict publication ethics</li>
+                </ul>
+                <a
+                  href="/author-guidelines"
+                  className="inline-flex items-center justify-center px-5 py-2 rounded-full bg-white border border-amber-600 text-amber-700 text-sm font-semibold hover:bg-amber-50 w-full text-center"
+                >
+                  Read Complete Author Guidelines
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Journal Issues Teaser */}
+        <section className="bg-slate-50 border-t border-slate-200 py-20 fade-section">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+              <div>
+                <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4 text-left">
+                  Journal Issues
+                </h2>
+                <p className="text-slate-600 text-sm md:text-base mb-4">
+                  IJEPA publishes monthly issues featuring peer-reviewed articles, reviews, and case studies across
+                  diverse engineering domains.
+                </p>
+                <div className="bg-white rounded-2xl border border-slate-200 p-5 mb-4 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                  <h3 className="text-lg font-semibold text-slate-900 mb-1">Current Issue</h3>
+                  <p className="text-sm text-slate-600 mb-2">Volume [X], Issue [Y] – [Month, Year]</p>
+                  <p className="text-xs text-slate-500 mb-3">
+                    Access the latest peer-reviewed articles published in this issue.
+                  </p>
+                  <a
+                    href="/journal-issues"
+                    className="inline-flex items-center px-4 py-2 rounded-full bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold"
+                  >
+                    View Current Issue
+                  </a>
+                </div>
+                <p className="text-sm text-slate-600">
+                  All past volumes and issues are available online under our open-access policy, allowing unrestricted
+                  access and citation of published work.
+                </p>
+              </div>
+
+              <div className="bg-white rounded-2xl border border-dashed border-slate-300 p-6 text-sm text-slate-600 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                <h3 className="text-lg font-semibold text-slate-900 mb-3">Archives</h3>
+                <p className="mb-3">
+                  Explore previously published volumes and issues of IJEPA to discover impactful research and trends
+                  across engineering disciplines.
+                </p>
+                <ul className="space-y-1 text-xs">
+                  <li>• Volume [X], Issue [Y], [Year] – View Articles</li>
+                  <li>• Volume [X-1], Issue [Y-1], [Year] – View Articles</li>
+                  <li>• Volume [X-2], Issue [Y-2], [Year] – View Articles</li>
+                </ul>
+                <p className="mt-3 text-xs text-slate-500">
+                  These are sample placeholders; update them as new issues are published.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Conference inquiries & indexing partners band */}
+        <section className="bg-sky-50 border-t border-slate-200 py-16 fade-section">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-12">
+              <div>
+                <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-6">
+                  Send us your Conference inquiries
+                </h2>
+                <div className="w-16 h-0.5 bg-sky-500 mb-6"></div>
+                <p className="text-slate-700 leading-relaxed">
+                  Institutions, universities, and colleges are encouraged to send inquiries about publishing their
+                  conference proceedings and special issues with IJEPA. Our team will guide you through the process
+                  and help you reach a global research audience.
+                </p>
+              </div>
+
+              <div className="text-slate-700 leading-relaxed">
+                <p className="mb-3">
+                  IJEPA invites both national and international conferences to publish their research proceedings
+                  online through our platform. For conference collaborations and proposals, please contact us using
+                  the conference inquiry form available on the website.
+                </p>
+                <p>
+                  For detailed discussions, you can also reach out via email to <span className="text-sky-700 font-medium">editor@ijepa.org</span>.
+                </p>
+              </div>
+            </div>
+
+            <div className="border-t border-slate-200 pt-10">
+              <h3 className="text-center text-lg font-semibold text-slate-800 mb-4">Indexing & Abstracting</h3>
+              <p className="text-center text-slate-600 max-w-3xl mx-auto mb-6 text-sm md:text-base">
+                IJEPA is committed to improving the visibility, accessibility, and citation of published research through
+                indexing in leading academic databases and assigning DOIs to every article.
+              </p>
+              <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12 mb-4">
+                <div className="h-10 flex items-center text-slate-500 text-lg font-semibold">Google Scholar</div>
+                <div className="h-10 flex items-center text-slate-500 text-lg font-semibold">ROAD</div>
+                <div className="h-10 flex items-center text-slate-500 text-lg font-semibold">ISSUU</div>
+                <div className="h-10 flex items-center text-slate-500 text-lg font-semibold">Slideshare</div>
+                <div className="h-10 flex items-center text-slate-500 text-lg font-semibold">CiteSeerX</div>
+              </div>
+              <p className="text-center text-slate-600 text-xs md:text-sm mb-4">
+                We are continuously working towards inclusion in major databases such as Scopus, Web of Science (ESCI), DOAJ,
+                EBSCO, ProQuest, and UGC-CARE to further enhance author visibility and recognition.
+              </p>
+              <div className="flex justify-center">
+                <a
+                  href="/indexing"
+                  className="inline-flex items-center justify-center px-5 py-2 rounded-full border border-sky-600 text-sky-700 text-sm font-semibold hover:bg-sky-50"
+                >
+                  Learn more about our indexing
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* About IJEPA - two-column layout */}
+        <section className="bg-gradient-to-br from-slate-50 to-white py-24 fade-section">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="mb-16 max-w-3xl">
+              <h2 className="text-4xl font-bold text-slate-900 mb-6 text-left">
+                About <span className="text-amber-700">IJEPA</span>
+              </h2>
+              <div className="w-24 h-1 bg-amber-700 rounded-full"></div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+              {/* Illustrative image / badge column */}
+              <div className="relative">
+                <div className="rounded-3xl bg-white shadow-xl border border-slate-200 overflow-hidden">
+                  <img
+                    src={hero}
+                    alt="Research and innovation illustration"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </div>
+
+              {/* Existing about content */}
+              <div className="prose prose-lg max-w-none text-slate-700 leading-relaxed">
+                <p className="mb-6">
+                  The <strong>International Journal of Engineering Practices and Applications (IJEPA)</strong> is a peer-reviewed, open-access journal dedicated to advancing research, innovation, and practical applications in the field of engineering. Our mission is to serve as a trusted platform for scholars, researchers, practitioners, and industry professionals to share knowledge, exchange ideas, and contribute to the progress of engineering science and technology.
+                </p>
+
+                <p className="mb-6">
+                  IJEPA publishes monthly high-quality original research papers, review articles, and case studies that address theoretical foundations, experimental investigations, and real-world applications across diverse engineering disciplines. We welcome interdisciplinary work that bridges the gap between academic research and industry practices, fostering solutions to contemporary challenges.
+                </p>
+
+                <div className="mt-8 mb-6">
+                  <h3 className="text-2xl font-bold text-slate-900 mb-4 flex items-center">
+                    <span className="w-8 h-8 bg-amber-100 text-amber-800 rounded-lg flex items-center justify-center mr-3">✓</span>
+                    Our Vision
+                  </h3>
+                  <p className="pl-11">
+                    To become a globally recognized journal that drives innovation, disseminates impactful research, and promotes collaboration across engineering domains.
+                  </p>
+                </div>
+
+                <div className="mb-6">
+                  <h3 className="text-2xl font-bold text-slate-900 mb-4 flex items-center">
+                    <span className="w-8 h-8 bg-amber-100 text-amber-800 rounded-lg flex items-center justify-center mr-3">✓</span>
+                    Our Scope
+                  </h3>
+                  <p className="pl-11 mb-4">
+                    IJEPA covers, but is not limited to, the following areas:
+                  </p>
+                  <ul className="pl-11 grid grid-cols-1 md:grid-cols-2 gap-2">
+                    <li className="flex items-start">
+                      <span className="text-amber-700 mr-2">•</span>
+                      <span>Civil, Mechanical, Electrical, and Electronics Engineering</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-amber-700 mr-2">•</span>
+                      <span>Computer Science, Information Technology, and Artificial Intelligence</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-amber-700 mr-2">•</span>
+                      <span>Industrial, Manufacturing, and Materials Engineering</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-amber-700 mr-2">•</span>
+                      <span>Communication, Control, and Instrumentation Systems</span>
+                    </li>
+                    <li className="flex items-start md:col-span-2">
+                      <span className="text-amber-700 mr-2">•</span>
+                      <span>Sustainable, Green, and Emerging Engineering Practices</span>
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="bg-amber-50 rounded-2xl p-6 border border-amber-100">
+                  <h3 className="text-2xl font-bold text-slate-900 mb-4 flex items-center">
+                    <span className="w-8 h-8 bg-amber-100 text-amber-800 rounded-lg flex items-center justify-center mr-3">✓</span>
+                    Why Publish with Us?
+                  </h3>
+                  <ul className="pl-11 space-y-2">
+                    <li className="flex items-start">
+                      <span className="text-green-600 mr-2">✓</span>
+                      <span>Rigorous peer-review process ensuring quality and credibility</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-green-600 mr-2">✓</span>
+                      <span>Open-access policy for maximum visibility and global reach</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-green-600 mr-2">✓</span>
+                      <span>Fast and efficient review and publication cycle</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-green-600 mr-2">✓</span>
+                      <span>Support for young researchers and academics worldwide</span>
+                    </li>
+                  </ul>
+                </div>
+
+                <p className="mt-8 text-lg italic text-slate-600">
+                  "At IJEPA, we believe that engineering is not just about knowledge creation but also about meaningful application.
+                  By connecting research with practice, we aim to contribute to technological growth and societal development."
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Publication Workflow Section */}
+        <section className="bg-white border-t border-slate-200 py-24 fade-section">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="mb-12 max-w-3xl">
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4 text-left">
+                Publication Workflow at IJEPA
+              </h2>
+              <p className="text-slate-600 text-base md:text-lg">
+                Understand how your manuscript moves from submission to online publication through our structured
+                editorial and peer-review workflow.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-8 md:gap-6">
+              <div className="flex flex-col items-center text-center">
+                <div className="w-16 h-16 rounded-full bg-sky-100 text-sky-700 flex items-center justify-center mb-4 text-2xl font-bold">
+                  1
+                </div>
+                <h3 className="font-semibold text-slate-900 mb-2">Submission</h3>
+                <p className="text-slate-600 text-sm">
+                  Authors submit their manuscripts via the online submission system or by email to the editorial office.
+                </p>
+              </div>
+
+              <div className="flex flex-col items-center text-center">
+                <div className="w-16 h-16 rounded-full bg-sky-100 text-sky-700 flex items-center justify-center mb-4 text-2xl font-bold">
+                  2
+                </div>
+                <h3 className="font-semibold text-slate-900 mb-2">Initial Screening</h3>
+                <p className="text-slate-600 text-sm">
+                  The editorial team performs a preliminary check for scope, formatting, plagiarism, and basic quality.
+                </p>
+              </div>
+
+              <div className="flex flex-col items-center text-center">
+                <div className="w-16 h-16 rounded-full bg-sky-100 text-sky-700 flex items-center justify-center mb-4 text-2xl font-bold">
+                  3
+                </div>
+                <h3 className="font-semibold text-slate-900 mb-2">Peer Review</h3>
+                <p className="text-slate-600 text-sm">
+                  Suitable manuscripts are assigned to qualified reviewers for detailed technical and scientific evaluation.
+                </p>
+              </div>
+
+              <div className="flex flex-col items-center text-center">
+                <div className="w-16 h-16 rounded-full bg-sky-100 text-sky-700 flex items-center justify-center mb-4 text-2xl font-bold">
+                  4
+                </div>
+                <h3 className="font-semibold text-slate-900 mb-2">Revision & Decision</h3>
+                <p className="text-slate-600 text-sm">
+                  Authors submit revisions based on reviewer comments; the editor issues acceptance, revision, or rejection.
+                </p>
+              </div>
+
+              <div className="flex flex-col items-center text-center">
+                <div className="w-16 h-16 rounded-full bg-sky-100 text-sky-700 flex items-center justify-center mb-4 text-2xl font-bold">
+                  5
+                </div>
+                <h3 className="font-semibold text-slate-900 mb-2">Publication & Indexing</h3>
+                <p className="text-slate-600 text-sm">
+                  Accepted papers are typeset, assigned to an issue, published online, and indexed in relevant databases.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* IJEPA Partner Network Section */}
+        <section className="bg-white border-t border-slate-200 py-24 fade-section">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+                IJEPA Partner Network (IPN)
+              </h2>
+              <p className="text-slate-600 max-w-2xl mx-auto">
+                Join our referral and reviewer network to support quality publications, earn rewards, and help
+                authors publish their research with IJEPA.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+              <div className="flex flex-col items-center text-center">
+                <div className="w-16 h-16 rounded-full bg-sky-100 text-sky-700 flex items-center justify-center mb-4 text-2xl font-bold">
+                  1
+                </div>
+                <h3 className="font-semibold text-slate-900 mb-2">Register as Referral/Reviewer</h3>
+                <p className="text-slate-600 text-sm">
+                  Sign up for the IJEPA Partner Network and create your profile.
+                </p>
+              </div>
+
+              <div className="flex flex-col items-center text-center">
+                <div className="w-16 h-16 rounded-full bg-sky-100 text-sky-700 flex items-center justify-center mb-4 text-2xl font-bold">
+                  2
+                </div>
+                <h3 className="font-semibold text-slate-900 mb-2">Submit Papers</h3>
+                <p className="text-slate-600 text-sm">
+                  Share research manuscripts from your network for consideration in IJEPA.
+                </p>
+              </div>
+
+              <div className="flex flex-col items-center text-center">
+                <div className="w-16 h-16 rounded-full bg-sky-100 text-sky-700 flex items-center justify-center mb-4 text-2xl font-bold">
+                  3
+                </div>
+                <h3 className="font-semibold text-slate-900 mb-2">Earn Rewards</h3>
+                <p className="text-slate-600 text-sm">
+                  Receive benefits and recognition for successful submissions and reviews.
+                </p>
+              </div>
+
+              <div className="flex flex-col items-center text-center">
+                <div className="w-16 h-16 rounded-full bg-sky-100 text-sky-700 flex items-center justify-center mb-4 text-2xl font-bold">
+                  4
+                </div>
+                <h3 className="font-semibold text-slate-900 mb-2">Withdraw Earnings</h3>
+                <p className="text-slate-600 text-sm">
+                  Track your rewards and withdraw your earnings as per the program guidelines.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-10 flex flex-col sm:flex-row justify-center gap-4">
               <a
-                href="/papers"
-                className="group bg-white text-slate-900 hover:bg-amber-50 font-semibold py-4 px-8 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1"
+                href="/joinusedito"
+                className="px-6 py-3 rounded-full bg-sky-700 hover:bg-sky-800 text-white font-semibold text-sm shadow-sm"
               >
-                Browse Papers...
-                <span className="ml-2 inline-block transition-transform group-hover:translate-x-1">→</span>
+                IJEPA Partner Network (IPN) Login
               </a>
               <a
                 href="/register"
-                className="group border-2 border-white text-white hover:bg-white hover:text-slate-900 font-semibold py-4 px-8 rounded-xl transition-all duration-300 hover:-translate-y-1"
+                className="px-6 py-3 rounded-full border border-sky-700 text-sky-700 hover:bg-sky-50 font-semibold text-sm"
               >
-                  Join Our Platform
+                Register as New Partner
               </a>
             </div>
           </div>
-        </div>
-      </section>
-       <section className="bg-gradient-to-br from-slate-50 to-white py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl font-bold text-slate-900 mb-6">
-              About <span className="text-amber-700">IJEPA</span>
-            </h2>
-            <div className="w-24 h-1 bg-amber-700 mx-auto rounded-full"></div>
-          </div>
+        </section>
 
-          <div className="prose prose-lg max-w-4xl mx-auto text-slate-700 leading-relaxed">
-            <p className="mb-6">
-              The <strong>International Journal of Engineering Practices and Applications (IJEPA)</strong> is a peer-reviewed, open-access journal dedicated to advancing research, innovation, and practical applications in the field of engineering. Our mission is to serve as a trusted platform for scholars, researchers, practitioners, and industry professionals to share knowledge, exchange ideas, and contribute to the progress of engineering science and technology.
-            </p>
-            
-            <p className="mb-6">
-              IJEPA publishes monthly high-quality original research papers, review articles, and case studies that address theoretical foundations, experimental investigations, and real-world applications across diverse engineering disciplines. We welcome interdisciplinary work that bridges the gap between academic research and industry practices, fostering solutions to contemporary challenges.
-            </p>
-
-            <div className="mt-12 mb-8">
-              <h3 className="text-2xl font-bold text-slate-900 mb-4 flex items-center">
-                <span className="w-8 h-8 bg-amber-100 text-amber-800 rounded-lg flex items-center justify-center mr-3">✓</span>
-                Our Vision
-              </h3>
-              <p className="pl-11">
-                To become a globally recognized journal that drives innovation, disseminates impactful research, and promotes collaboration across engineering domains.
-              </p>
-            </div>
-
-            <div className="mb-8">
-              <h3 className="text-2xl font-bold text-slate-900 mb-4 flex items-center">
-                <span className="w-8 h-8 bg-amber-100 text-amber-800 rounded-lg flex items-center justify-center mr-3">✓</span>
-                Our Scope
-              </h3>
-              <p className="pl-11 mb-4">
-                IJEPA covers, but is not limited to, the following areas:
-              </p>
-              <ul className="pl-11 grid grid-cols-1 md:grid-cols-2 gap-2">
-                <li className="flex items-start">
-                  <span className="text-amber-700 mr-2">•</span>
-                  <span>Civil, Mechanical, Electrical, and Electronics Engineering</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-amber-700 mr-2">•</span>
-                  <span>Computer Science, Information Technology, and Artificial Intelligence</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-amber-700 mr-2">•</span>
-                  <span>Industrial, Manufacturing, and Materials Engineering</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-amber-700 mr-2">•</span>
-                  <span>Communication, Control, and Instrumentation Systems</span>
-                </li>
-                <li className="flex items-start md:col-span-2">
-                  <span className="text-amber-700 mr-2">•</span>
-                  <span>Sustainable, Green, and Emerging Engineering Practices</span>
-                </li>
-              </ul>
-            </div>
-
-            <div className="bg-amber-50 rounded-2xl p-6 border border-amber-100">
-              <h3 className="text-2xl font-bold text-slate-900 mb-4 flex items-center">
-                <span className="w-8 h-8 bg-amber-100 text-amber-800 rounded-lg flex items-center justify-center mr-3">✓</span>
-                Why Publish with Us?
-              </h3>
-              <ul className="pl-11 space-y-2">
-                <li className="flex items-start">
-                  <span className="text-green-600 mr-2">✓</span>
-                  <span>Rigorous peer-review process ensuring quality and credibility</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-green-600 mr-2">✓</span>
-                  <span>Open-access policy for maximum visibility and global reach</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-green-600 mr-2">✓</span>
-                  <span>Fast and efficient review and publication cycle</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-green-600 mr-2">✓</span>
-                  <span>Support for young researchers and academics worldwide</span>
-                </li>
-              </ul>
-            </div>
-
-            <p className="mt-8 text-center text-lg italic text-slate-600">
-              "At IJEPA, we believe that engineering is not just about knowledge creation but also about meaningful application. 
-              By connecting research with practice, we aim to contribute to technological growth and societal development."
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Important Dates Section */}
-      
-
-      {/* Search and Filter Section */}
-      
-      {/* Features Section */}
-      <section className="bg-white border-t border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl font-bold text-slate-900 mb-6">
-              Why Researchers Choose Build Softech
-            </h2>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-              We provide a comprehensive solution for academic research publication and peer review
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            <div className="group relative bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-500 hover:-translate-y-2 border border-slate-200">
-              <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-amber-200 transition-all duration-300">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" className="text-amber-700">
-                  <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-4 text-center">
-                Rigorous Peer Review
-              </h3>
-              <p className="text-slate-600 text-lg leading-relaxed text-center">
-                Your paper is reviewed by qualified experts assigned by our editorial team for quality and integrity.
-              </p>
-            </div>
-
-            <div className="group relative bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-500 hover:-translate-y-2 border border-slate-200">
-              <div className="w-16 h-16 bg-amber-50 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-amber-100 transition-all duration-300">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" className="text-amber-700">
-                  <path d="M13 10V3L4 14h7v7l9-11h-7z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-4 text-center">
-                Fast Turnaround
-              </h3>
-              <p className="text-slate-600 text-lg leading-relaxed text-center">
-                Streamlined workflows ensure your paper moves quickly from submission to publication.
-              </p>
-            </div>
-
-            <div className="group relative bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-500 hover:-translate-y-2 border border-slate-200">
-              <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-amber-200 transition-all duration-300">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" className="text-amber-700">
-                  <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" fill="currentColor"/>
-                </svg>
-              </div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-4 text-center">
-                Global Visibility
-              </h3>
-              <p className="text-slate-600 text-lg leading-relaxed text-center">
-                Get your research seen by academics and institutions worldwide through our indexed platform.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Quick Links Section */}
-      <section className="bg-slate-50 py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl font-bold text-slate-900 mb-6">
-              Quick Access
-            </h2>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-              Navigate to key sections of our platform with a single click.
-            </p>
-          </div>
-          <div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {/* Card 1: Indexing & Abstracting */}
-              <div className="group bg-white p-8 rounded-2xl border border-slate-200 transition-all duration-300 hover:border-amber-400 hover:shadow-md">
-                <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" className="text-amber-700">
-                    <path d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-4 text-center">
-                  Indexing & Abstracting
-                </h3>
-                <p className="text-slate-600 text-lg leading-relaxed text-center mb-6">
-                  Discover where our journal is indexed and abstracted.
+        {/* FAQ & CTA Section */}
+        <section className="bg-slate-50 border-t border-slate-200 py-24 fade-section">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+              {/* FAQ Column */}
+              <div>
+                <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4 text-left">
+                  Frequently Asked Questions
+                </h2>
+                <p className="text-slate-600 mb-8">
+                  Find quick answers to some of the most common questions about publishing with IJEPA.
                 </p>
-                <a href="/indexing" className="block text-center bg-white border border-amber-700 text-amber-800 hover:bg-amber-700 hover:text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300">
-                  Learn More
-                </a>
+
+                <div className="space-y-4">
+                  <details className="group bg-white border border-slate-200 rounded-2xl p-4 open:shadow-md transition-all">
+                    <summary className="flex justify-between items-center cursor-pointer list-none">
+                      <span className="font-semibold text-slate-900">
+                        How long does the review process take?
+                      </span>
+                      <span className="ml-4 text-slate-500 group-open:rotate-180 transition-transform">▾</span>
+                    </summary>
+                    <p className="mt-3 text-sm text-slate-600">
+                      Review timelines may vary depending on the complexity of the manuscript and reviewer availability,
+                      but we aim to provide an initial decision within a few weeks of submission.
+                    </p>
+                  </details>
+
+                  <details className="group bg-white border border-slate-200 rounded-2xl p-4 open:shadow-md transition-all">
+                    <summary className="flex justify-between items-center cursor-pointer list-none">
+                      <span className="font-semibold text-slate-900">
+                        Where can I find the Author Guidelines?
+                      </span>
+                      <span className="ml-4 text-slate-500 group-open:rotate-180 transition-transform">▾</span>
+                    </summary>
+                    <p className="mt-3 text-sm text-slate-600">
+                      Detailed instructions for preparing and submitting your manuscript are available on the
+                      Author Guidelines page.
+                    </p>
+                  </details>
+
+                  <details className="group bg-white border border-slate-200 rounded-2xl p-4 open:shadow-md transition-all">
+                    <summary className="flex justify-between items-center cursor-pointer list-none">
+                      <span className="font-semibold text-slate-900">
+                        How do I track the status of my submitted paper?
+                      </span>
+                      <span className="ml-4 text-slate-500 group-open:rotate-180 transition-transform">▾</span>
+                    </summary>
+                    <p className="mt-3 text-sm text-slate-600">
+                      After submission, you can track the status of your manuscript by logging into your author
+                      account or by contacting the editorial office with your paper ID.
+                    </p>
+                  </details>
+
+                  <details className="group bg-white border border-slate-200 rounded-2xl p-4 open:shadow-md transition-all">
+                    <summary className="flex justify-between items-center cursor-pointer list-none">
+                      <span className="font-semibold text-slate-900">
+                        Do you provide e-certificates for authors and reviewers?
+                      </span>
+                      <span className="ml-4 text-slate-500 group-open:rotate-180 transition-transform">▾</span>
+                    </summary>
+                    <p className="mt-3 text-sm text-slate-600">
+                      Yes, e-certificates can be provided for accepted papers and for reviewers who complete
+                      their review assignments.
+                    </p>
+                  </details>
+                </div>
               </div>
 
-              {/* Card 2: Journal Issues */}
-              <div className="group bg-white p-8 rounded-2xl border border-slate-200 transition-all duration-300 hover:border-amber-400 hover:shadow-md">
-                <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" className="text-amber-700">
-                    <path d="M4 6h16M4 12h16M4 18h7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-4 text-center">
-                  Journal Issues
-                </h3>
-                <p className="text-slate-600 text-lg leading-relaxed text-center mb-6">
-                  Browse our past and current journal issues.
-                </p>
-                <a href="/journal-issues" className="block text-center bg-white border border-amber-700 text-amber-800 hover:bg-amber-700 hover:text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300">
-                  View Issues
-                </a>
-              </div>
-
-              {/* Card 3: Join as Editor/Reviewer */}
-              <div className="group bg-white p-8 rounded-2xl border border-slate-200 transition-all duration-300 hover:border-amber-400 hover:shadow-md">
-                <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" className="text-amber-700">
-                    <path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-4 text-center">
-                  Join Our Team
-                </h3>
-                <p className="text-slate-600 text-lg leading-relaxed text-center mb-6">
-                  Become an editor or reviewer for IJEPA.
-                </p>
-                <a href="/joinusedito" className="block text-center bg-white border border-amber-700 text-amber-800 hover:bg-amber-700 hover:text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300">
-                  Join Now
-                </a>
-              </div>
-            </div>
-            <div className="mt-8 flex justify-center">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Card 4: Author Guidelines */}
-                <div className="group bg-white p-8 rounded-2xl border border-slate-200 transition-all duration-300 hover:border-amber-400 hover:shadow-md">
-                  <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" className="text-amber-700">
-                      <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </div>
-                  <h3 className="text-2xl font-bold text-slate-900 mb-4 text-center">
-                    Author Guidelines
+              {/* CTA Column */}
+              <div className="bg-sky-700 text-white rounded-3xl overflow-hidden flex flex-col md:flex-row items-stretch shadow-xl">
+                <div className="flex-1 p-8 lg:p-10 flex flex-col justify-center">
+                  <h3 className="text-2xl md:text-3xl font-bold mb-4">
+                    Sign Up for IJEPA Partner Network
                   </h3>
-                  <p className="text-slate-600 text-lg leading-relaxed text-center mb-6">
-                    Everything you need to know to prepare your manuscript.
+                  <p className="text-sky-100 mb-6 text-sm md:text-base">
+                    Register now to become part of our growing reviewer and referral community. Help authors publish
+                    impactful research while earning recognition and rewards.
                   </p>
-                  <a href="/author-guidelines" className="block text-center bg-white border border-amber-700 text-amber-800 hover:bg-amber-700 hover:text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300">
-                    Read Guidelines
+                  <div className="flex flex-wrap gap-4">
+                    <a
+                      href="/register"
+                      className="inline-flex items-center justify-center px-6 py-3 rounded-full bg-white text-sky-800 font-semibold text-sm hover:bg-sky-50 transition-colors"
+                    >
+                      Register Free
+                    </a>
+                    <a
+                      href="/joinusedito"
+                      className="inline-flex items-center justify-center px-6 py-3 rounded-full border border-sky-200 text-sky-50 font-semibold text-sm hover:bg-sky-600 transition-colors"
+                    >
+                      IPN Login
+                    </a>
+                  </div>
+                </div>
+                <div className="hidden md:block md:w-1/3 bg-cover bg-center" style={{ backgroundImage: `url(${hero})` }}></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Contact & Submission Strip */}
+        <section className="bg-slate-900 py-12 border-t border-slate-800 fade-section">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 text-slate-100">
+              <div>
+                <h2 className="text-2xl font-bold mb-3">Contact the Editorial Office</h2>
+                <p className="text-slate-300 text-sm mb-4">
+                  For queries related to manuscript preparation, submission status, or journal policies, feel free to
+                  reach out to us. We aim to respond within 22 business days.
+                </p>
+                <ul className="text-sm space-y-1">
+                  <li><span className="font-semibold">Email:</span> editor@ijepa.org</li>
+                  <li><span className="font-semibold">Phone:</span> +91 98765 43210</li>
+                </ul>
+              </div>
+
+              <div>
+                <h2 className="text-2xl font-bold mb-3">Submit Your Paper</h2>
+                <p className="text-slate-300 text-sm mb-4">
+                  Ready to publish with IJEPA? Prepare your manuscript in DOC/DOCX format and follow the Author
+                  Guidelines before submitting.
+                </p>
+                <ul className="text-sm text-slate-200 space-y-1 mb-4">
+                  <li>• Fill in the required author and manuscript details.</li>
+                  <li>• Upload your manuscript and copyright form.</li>
+                  <li>• Add any additional comments or cover letter.</li>
+                </ul>
+                <div className="flex flex-wrap gap-3">
+                  <a
+                    href="/SubmitForm"
+                    className="inline-flex items-center px-5 py-2 rounded-full bg-amber-500 hover:bg-amber-600 text-slate-900 text-sm font-semibold"
+                  >
+                    Go to Submission Form
                   </a>
-                </div>
-
-                {/* Card 5: Call for Papers */}
-                <div className="group bg-white p-8 rounded-2xl border border-slate-200 transition-all duration-300 hover:border-amber-400 hover:shadow-md">
-                  <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" className="text-amber-700">
-                      <path d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.148-6.443a1.76 1.76 0 013.417-.592zM11 5.882a1.76 1.76 0 012.592.443l2.148 6.443a1.76 1.76 0 01-3.417.592l-2.148-6.443a1.76 1.76 0 01.825-1.036z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </div>
-                  <h3 className="text-2xl font-bold text-slate-900 mb-4 text-center">
-                    Call for Papers
-                  </h3>
-                  <p className="text-slate-600 text-lg leading-relaxed text-center mb-6">
-                    Submit your latest research to our upcoming issues.
-                  </p>
-                  <a href="/callforpapers" className="block text-center bg-white border border-amber-700 text-amber-800 hover:bg-amber-700 hover:text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300">
-                    Submit Now
+                  <a
+                    href="/author-guidelines"
+                    className="inline-flex items-center px-5 py-2 rounded-full border border-slate-300 text-slate-100 text-sm font-semibold hover:bg-slate-800"
+                  >
+                    View Author Guidelines
                   </a>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* About Us Section - IJEPA */}
-     
-
-
-      {/* Scroll to Top Button */}
-      {showScrollTop && (
-        <button
-          onClick={scrollToTop}
-          className="fixed bottom-8 right-8 bg-slate-900 hover:bg-slate-800 text-white p-4 rounded-full shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-xl z-50"
-          aria-label="Scroll to top"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M12 19V5M5 12l7-7 7 7" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </button>
-      )}
-    </div>
-  </>
-);
+        {/* Scroll to Top Button */}
+        {showScrollTop && (
+          <button
+            onClick={scrollToTop}
+            className="fixed bottom-8 right-8 bg-slate-900 hover:bg-slate-800 text-white p-4 rounded-full shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-xl z-50"
+            aria-label="Scroll to top"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M12 19V5M5 12l7-7 7 7" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+        )}
+      </div>
+    </>
+  );
 };
 export default Landing;

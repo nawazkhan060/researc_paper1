@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import logo from '../assets/logo.png';
@@ -7,7 +8,6 @@ const Header = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isDesktopMenuOpen, setIsDesktopMenuOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -42,130 +42,116 @@ const Header = () => {
         }
       `}</style>
 
-      <header className="bg-white shadow-lg h-24 hidden md:flex">
-        <Link to="/" className="border flex-shrink-0 flex items-center justify-center px-4 lg:px-6 xl:px-8">
-          <img 
-            src={logo} 
-            alt="Research Platform Logo" 
-            className="w-16 h-16 object-contain"
-          />
-        </Link>
-        
-        <div className="flex items-center ml-4 xl:ml-8 mr-auto">
-          <button
-            type="button"
-            onClick={() => setIsDesktopMenuOpen((prev) => !prev)}
-            className="inline-flex items-center px-6 py-3 border border-academic-200 rounded-full text-base lg:text-lg font-semibold text-academic-700 hover:bg-academic-50 hover:border-academic-300 transition-colors duration-200 shadow-sm"
-          >
-            <span className="mr-2">Menu</span>
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            </svg>
-          </button>
-        </div>
-
-        <div className="border flex items-center px-4 lg:px-6 xl:px-8">
-         
-          
-          {user ? (
-            <button
-              onClick={handleLogout}
-              className="bg-black hover:bg-gray-700 text-white font-bold px-4 xl:px-6 py-2 xl:py-3 rounded"
-            >
-              Logout
-            </button>
-          ) : (
-            <>
-              <Link 
-                to="/login" 
-                className="bg-black hover:bg-gray-700 text-white font-bold px-4 xl:px-6 py-2 xl:py-3 rounded mr-2"
-              >
-                Login
-              </Link>
-              <Link 
-                to="/register" 
-                className="bg-black hover:bg-gray-700 text-white font-bold px-4 xl:px-6 py-2 xl:py-3 rounded"
-              >
-                Sign Up
-              </Link>
-            </>
-          )}
-        </div>
-      </header>
-
-      {isDesktopMenuOpen && (
-        <div className="hidden md:block fixed top-24 inset-x-0 bg-white border-b border-academic-200 shadow-lg z-40">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <nav className="flex flex-wrap items-center gap-x-8 gap-y-2 py-4 text-base lg:text-lg font-semibold text-academic-700">
-              <Link
-                to="/"
-                onClick={() => setIsDesktopMenuOpen(false)}
-                className="hover:text-primary-600"
-              >
-                Home
-              </Link>
-              <Link
-                to="/indexing"
-                onClick={() => setIsDesktopMenuOpen(false)}
-                className="hover:text-primary-600"
-              >
-                Indexing
-              </Link>
-              <Link
-                to="/journal-issues"
-                onClick={() => setIsDesktopMenuOpen(false)}
-                className="hover:text-primary-600"
-              >
-                Journal Issues
-              </Link>
-              <Link
-                to="/author-guidelines"
-                onClick={() => setIsDesktopMenuOpen(false)}
-                className="hover:text-primary-600"
-              >
-                Author Guidelines
-              </Link>
-              <Link
-                to="/callforpapers"
-                onClick={() => setIsDesktopMenuOpen(false)}
-                className="hover:text-primary-600"
-              >
-                Call for Papers
-              </Link>
-              <Link
-                to="/joinusedito"
-                onClick={() => setIsDesktopMenuOpen(false)}
-                className="hover:text-primary-600"
-              >
-                Join Us
-              </Link>
-              {user && (
-                <Link
-                  to={
-                    user.role === 'author' ? '/author-dashboard' :
-                    user.role === 'reviewer' ? '/reviewer-dashboard' :
-                    '/admin-dashboard'
-                  }
-                  onClick={() => setIsDesktopMenuOpen(false)}
-                  className="hover:text-primary-600"
-                >
-                  Dashboard
-                </Link>
+      <header className="hidden md:block bg-white shadow-lg relative overflow-visible">
+        {/* Top info bar aligned to the right */}
+        <div className="bg-sky-600 text-white text-xs lg:text-sm">
+          <div className="max-w-7xl mx-auto px-4 lg:px-8 flex items-center justify-end h-10 space-x-6">
+            <span className="whitespace-nowrap">+91 98765 43210</span>
+            <span className="whitespace-nowrap">ISSN: 2349-6002</span>
+            <span className="hidden md:inline-block whitespace-nowrap">
+              An International Peer-Reviewed Research Journal
+            </span>
+            <div className="flex items-center space-x-2">
+              {user ? (
+                <>
+                  <Link
+                    to={
+                      user.role === 'author'
+                        ? '/author-dashboard'
+                        : user.role === 'reviewer'
+                        ? '/reviewer-dashboard'
+                        : '/admin-dashboard'
+                    }
+                    className="px-3 py-1 text-xs lg:text-sm font-semibold bg-sky-700 hover:bg-sky-800 rounded-md whitespace-nowrap"
+                  >
+                    Dashboard
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="px-3 py-1 text-xs lg:text-sm font-semibold bg-slate-900 hover:bg-slate-800 rounded-md whitespace-nowrap"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    className="px-3 py-1 text-xs lg:text-sm font-semibold bg-sky-700 hover:bg-sky-800 rounded-md whitespace-nowrap"
+                  >
+                    Author Login
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="px-3 py-1 text-xs lg:text-sm font-semibold bg-slate-900 hover:bg-slate-800 rounded-md whitespace-nowrap"
+                  >
+                    Register
+                  </Link>
+                </>
               )}
-            </nav>
+            </div>
           </div>
         </div>
-      )}
+
+        {/* Main row: logo on left, nav & dashboard aligned right */}
+        <div className="bg-white border-b border-academic-200 relative">
+          <div className="max-w-7xl mx-auto px-4 lg:px-8 flex items-center h-20 lg:h-24">
+            {/* Logo - larger, shifted left, overlapping slightly into blue strip */}
+            <div className="flex-shrink-0 flex items-center h-full relative z-20 -mt-6">
+              <Link
+                to="/"
+                className="flex items-center justify-center w-32 h-32 lg:w-36 lg:h-36 rounded-full bg-sky-400 border-4 border-sky-600 shadow-md -ml-10"
+              >
+                <img
+                  src={logo}
+                  alt="Research Platform Logo"
+                  className="w-24 h-24 lg:w-28 lg:h-28 object-contain"
+                />
+              </Link>
+            </div>
+
+            {/* Nav + Dashboard on the right */}
+            <div className="flex-1 flex items-center justify-end space-x-6 lg:space-x-10 ml-10 relative z-10">
+              <nav className="flex items-center space-x-6 lg:space-x-8 text-sm lg:text-base font-semibold text-academic-700 header-links">
+                <Link to="/" className="hover:text-primary-600">
+                  Home
+                </Link>
+                <Link to="/indexing" className="hover:text-primary-600">
+                  Indexing
+                </Link>
+                <Link to="/journal-issues" className="hover:text-primary-600">
+                  Journal Issues
+                </Link>
+                <Link to="/author-guidelines" className="hover:text-primary-600">
+                  Author Guidelines
+                </Link>
+                <Link to="/callforpapers" className="hover:text-primary-600">
+                  Call for Papers
+                </Link>
+                <Link to="/joinusedito" className="hover:text-primary-600">
+                  Join Us
+                </Link>
+              </nav>
+
+              {/* Dashboard button replacing Submit Paper */}
+              <Link
+                to={
+                  user && user.role === 'author'
+                    ? '/author-dashboard'
+                    : user && user.role === 'reviewer'
+                    ? '/reviewer-dashboard'
+                    : user && user.role === 'admin'
+                    ? '/admin-dashboard'
+                    : '/login'
+                }
+                className="px-5 py-2 lg:px-7 lg:py-3 rounded-full bg-amber-500 hover:bg-amber-600 text-academic-900 font-semibold text-sm lg:text-base whitespace-nowrap shadow-sm"
+              >
+                Dashboard
+              </Link>
+            </div>
+          </div>
+        </div>
+      </header>
 
       {/* Mobile Header - Keep existing mobile functionality */}
       <header className="bg-white shadow-sm border-b border-academic-200 md:hidden sticky top-0 z-50">
@@ -173,17 +159,18 @@ const Header = () => {
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-3">
-              <img 
-                src={logo} 
-                alt="Research Platform Logo" 
+              <img
+                src={logo}
+                alt="Research Platform Logo"
                 className="w-10 h-10 object-contain"
               />
+
               <div>
                 <span className="block text-xl font-bold text-academic-900 leading-tight">
                   IJEPA
                 </span>
                 <span className="block text-xs text-slate-500 font-medium">
-                  build by Softech publication
+                  build by Billsoft publication
                 </span>
               </div>
             </Link>
