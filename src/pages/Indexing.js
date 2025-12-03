@@ -24,7 +24,7 @@ const Indexing = () => {
             <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-amber-600 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-pulse"></div>
             <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-amber-400 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-pulse animation-delay-2000"></div>
           </div>
-          
+
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h1 className="text-4xl md:text-5xl font-bold mb-6">
               Indexing & <span className="text-amber-200">Abstracting</span>
@@ -54,7 +54,7 @@ const Indexing = () => {
               </div>
               <h2 className="text-3xl font-bold text-slate-900">Currently Indexed In</h2>
             </div>
-            
+
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {currentIndexing.map((item, index) => (
                 <div
@@ -83,9 +83,9 @@ const Indexing = () => {
               <div className="w-10 h-10 bg-amber-50 rounded-lg flex items-center justify-center mr-4">
               </div>
             </div>
-            
+
             <div className="space-y-6">
-        
+
             </div>
           </section>
 
@@ -122,7 +122,7 @@ const Indexing = () => {
                 <div className="flex-shrink-0 mb-6 md:mb-0 md:mr-8">
                   <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center">
                     <svg className="w-8 h-8 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path d="M13 10V3L4 14h7v7l9-11h-7z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M13 10V3L4 14h7v7l9-11h-7z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </div>
                 </div>
@@ -156,7 +156,7 @@ const Indexing = () => {
         </div>
       </main>
 
-      
+
     </div>
   );
 };

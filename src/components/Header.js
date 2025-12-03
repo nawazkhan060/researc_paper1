@@ -1,18 +1,38 @@
 import React, { useState } from 'react';
 
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import logo from '../assets/logo.png';
+import StarBorder from './StarBorder';
 
 const Header = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
 
   const handleLogout = () => {
     logout();
     navigate('/');
   };
+
+  const desktopNavItems = [
+    { label: 'Home', href: '/' },
+    { label: 'Indexing', href: '/indexing' },
+    { label: 'Journal Issues', href: '/journal-issues' },
+    { label: 'Author Guidelines', href: '/author-guidelines' },
+    { label: 'Call for Papers', href: '/callforpapers' },
+    { label: 'Join Us', href: '/joinusedito' },
+  ];
+
+  const dashboardHref =
+    user && user.role === 'author'
+      ? '/author-dashboard'
+      : user && user.role === 'reviewer'
+      ? '/reviewer-dashboard'
+      : user && user.role === 'admin'
+      ? '/admin-dashboard'
+      : '/login';
 
   return (
     <>
@@ -93,62 +113,49 @@ const Header = () => {
           </div>
         </div>
 
-        {/* Main row: logo on left, nav & dashboard aligned right */}
-        <div className="bg-white border-b border-academic-200 relative">
-          <div className="max-w-7xl mx-auto px-4 lg:px-8 flex items-center h-20 lg:h-24">
-            {/* Logo - larger, shifted left, overlapping slightly into blue strip */}
-            <div className="flex-shrink-0 flex items-center h-full relative z-20 -mt-6">
-              <Link
-                to="/"
-                className="flex items-center justify-center w-32 h-32 lg:w-36 lg:h-36 rounded-full bg-sky-400 border-4 border-sky-600 shadow-md -ml-10"
-              >
-                <img
-                  src={logo}
-                  alt="Research Platform Logo"
-                  className="w-24 h-24 lg:w-28 lg:h-28 object-contain"
-                />
-              </Link>
-            </div>
+        {/* Desktop navbar */}
+        <div className="bg-white">
+          <div className="w-full px-6 lg:px-10 flex items-center justify-between h-20">
+            {/* Logo and title */}
+            <Link to="/" className="flex items-center space-x-4">
+              <img
+                src={logo}
+                alt="Research Platform Logo"
+                className="w-16 h-16 object-contain"
+              />
+              <div>
+                <span className="block text-3xl font-bold text-slate-900 leading-tight whitespace-nowrap">
+                  IJEPA
+                </span>
+                <span className="block text-xs lg:text-sm text-slate-500 font-medium whitespace-nowrap">
+                  International Journal of Engineering Practices and Applications
+                </span>
+              </div>
+            </Link>
 
-            {/* Nav + Dashboard on the right */}
-            <div className="flex-1 flex items-center justify-end space-x-6 lg:space-x-10 ml-10 relative z-10">
-              <nav className="flex items-center space-x-6 lg:space-x-8 text-sm lg:text-base font-semibold text-academic-700 header-links">
-                <Link to="/" className="hover:text-primary-600">
-                  Home
+            {/* Nav links + Dashboard button */}
+            <nav className="flex items-center space-x-6">
+              <ul className="header-links flex items-center space-x-6 text-base font-semibold text-slate-800">
+                {desktopNavItems.map(item => (
+                  <li
+                    key={item.href}
+                    className={location.pathname === item.href ? 'active' : ''}
+                  >
+                    <Link to={item.href} className="hover:text-amber-600">
+                      <span>{item.label}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+              <StarBorder as="button" className="inline-flex rounded-full" color="amber" speed="6s">
+                <Link
+                  to={dashboardHref}
+                  className="px-6 py-2.5 rounded-full bg-amber-500 hover:bg-amber-600 text-white text-base font-semibold shadow-md whitespace-nowrap"
+                >
+                  Dashboard
                 </Link>
-                <Link to="/indexing" className="hover:text-primary-600">
-                  Indexing
-                </Link>
-                <Link to="/journal-issues" className="hover:text-primary-600">
-                  Journal Issues
-                </Link>
-                <Link to="/author-guidelines" className="hover:text-primary-600">
-                  Author Guidelines
-                </Link>
-                <Link to="/callforpapers" className="hover:text-primary-600">
-                  Call for Papers
-                </Link>
-                <Link to="/joinusedito" className="hover:text-primary-600">
-                  Join Us
-                </Link>
-              </nav>
-
-              {/* Dashboard button replacing Submit Paper */}
-              <Link
-                to={
-                  user && user.role === 'author'
-                    ? '/author-dashboard'
-                    : user && user.role === 'reviewer'
-                    ? '/reviewer-dashboard'
-                    : user && user.role === 'admin'
-                    ? '/admin-dashboard'
-                    : '/login'
-                }
-                className="px-5 py-2 lg:px-7 lg:py-3 rounded-full bg-amber-500 hover:bg-amber-600 text-academic-900 font-semibold text-sm lg:text-base whitespace-nowrap shadow-sm"
-              >
-                Dashboard
-              </Link>
-            </div>
+              </StarBorder>
+            </nav>
           </div>
         </div>
       </header>

@@ -91,17 +91,31 @@ const ModelInner = ({
     g.updateWorldMatrix(true, true);
 
     const sphere = new THREE.Box3().setFromObject(g).getBoundingSphere(new THREE.Sphere());
-    const s = 1 / (sphere.radius * 2);
+    const s = 1 / Math.max(0.001, sphere.radius * 2);
     g.position.set(-sphere.center.x, -sphere.center.y, -sphere.center.z);
     g.scale.setScalar(s);
 
     g.traverse(o => {
-      if (o.isMesh) {
-        o.castShadow = true;
-        o.receiveShadow = true;
+      if (!o.isMesh || !o.material) return;
+
+      o.castShadow = true;
+      o.receiveShadow = true;
+
+      if (Array.isArray(o.material)) {
+        o.material.forEach(m => {
+          if (!m) return;
+          m.side = THREE.FrontSide;
+          if (fadeIn) {
+            m.transparent = true;
+            m.opacity = 0;
+          }
+        });
+      } else {
+        const m = o.material;
+        m.side = THREE.FrontSide;
         if (fadeIn) {
-          o.material.transparent = true;
-          o.material.opacity = 0;
+          m.transparent = true;
+          m.opacity = 0;
         }
       }
     });
@@ -420,7 +434,7 @@ const ModelViewer = ({
           gl.outputColorSpace = THREE.SRGBColorSpace;
         }}
         camera={{ fov: 50, position: [0, 0, camZ], near: 0.01, far: 100 }}
-        style={{ touchAction: 'pan-y pinch-zoom' }}
+        style={{ touchAction: 'pan-y pinch-zoom', background: '#020617cc' }}
       >
         {environmentPreset !== 'none' && <Environment preset={environmentPreset} background={false} />}
 

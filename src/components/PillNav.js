@@ -219,16 +219,16 @@ const PillNav = ({
     ['--pill-bg']: pillColor,
     ['--hover-text']: hoveredPillTextColor,
     ['--pill-text']: resolvedPillTextColor,
-    ['--nav-h']: '42px',
-    ['--logo']: '36px',
+    ['--nav-h']: '64px',
+    ['--logo']: '48px',
     ['--pill-pad-x']: '18px',
     ['--pill-gap']: '3px'
   };
 
   return (
-    <div className="absolute top-[1em] z-[1000] w-full left-0 md:w-auto md:left-auto">
+    <div className="absolute -top-4 z-[1000] w-full left-0 md:w-auto md:left-auto md:right-8">
       <nav
-        className={`w-full md:w-max flex items-center justify-between md:justify-start box-border px-4 md:px-0 ${className}`}
+        className={`w-full md:w-max flex items-center justify-between md:justify-end box-border px-4 md:px-0 ${className}`}
         aria-label="Primary"
         style={cssVars}
       >
@@ -245,7 +245,7 @@ const PillNav = ({
             style={{
               width: 'var(--nav-h)',
               height: 'var(--nav-h)',
-              background: 'var(--base, #000)'
+              background: 'var(--base, #fff)'
             }}
           >
             <img src={logo} alt={logoAlt} ref={logoImgRef} className="w-full h-full object-cover block" />
@@ -274,7 +274,7 @@ const PillNav = ({
           className="relative items-center rounded-full hidden md:flex ml-2"
           style={{
             height: 'var(--nav-h)',
-            background: 'var(--base, #000)'
+            background: 'var(--base, #fff)'
           }}
         >
           <ul
@@ -378,7 +378,7 @@ const PillNav = ({
           style={{
             width: 'var(--nav-h)',
             height: 'var(--nav-h)',
-            background: 'var(--base, #000)'
+            background: 'var(--base, #fff)'
           }}
         >
           <span
