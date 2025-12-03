@@ -32,7 +32,23 @@ const Landing = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Scroll fade effect is currently disabled to avoid any chance of content staying hidden.
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+          } else {
+            entry.target.classList.remove('is-visible');
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: '-5% 0px -5% 0px' }
+    );
+
+    document.querySelectorAll('.fade-section').forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
 
   const loadPublishedPapers = async () => {
     try {
@@ -95,9 +111,16 @@ const Landing = () => {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
         .landing-page-roboto { font-family: 'Roboto', sans-serif; }
-        /* Keep sections visible by default; fade logic can be re-enabled later if needed */
-        .fade-section { opacity: 1; transform: none; transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
-        .fade-section.is-visible { opacity: 1; transform: none; }
+        /* Scroll-triggered fade/slide animation */
+        .fade-section {
+          opacity: 0;
+          transform: translateY(40px);
+          transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        .fade-section.is-visible {
+          opacity: 1;
+          transform: translateY(0);
+        }
       `}</style>
       <div className="bg-slate-50 landing-page-roboto">
         {/* Hero Section - text left, image right */}
