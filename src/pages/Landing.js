@@ -46,8 +46,18 @@ const Landing = () => {
       { threshold: 0.1, rootMargin: '-5% 0px -5% 0px' }
     );
 
-    document.querySelectorAll('.fade-section').forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
+    // Add fade-ready after a short delay so content is visible on load
+    const timeout = setTimeout(() => {
+      document.querySelectorAll('.fade-section').forEach((el) => {
+        el.classList.add('fade-ready');
+        observer.observe(el);
+      });
+    }, 100);
+
+    return () => {
+      clearTimeout(timeout);
+      observer.disconnect();
+    };
   }, []);
 
   const loadPublishedPapers = async () => {
@@ -113,11 +123,20 @@ const Landing = () => {
         .landing-page-roboto { font-family: 'Roboto', sans-serif; }
         /* Scroll-triggered fade/slide animation */
         .fade-section {
-          opacity: 0;
-          transform: translateY(40px);
+          opacity: 1;
+          transform: translateY(0);
           transition: opacity 0.8s ease-out, transform 0.8s ease-out;
         }
         .fade-section.is-visible {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        /* Hide after a short delay so observer can work */
+        .fade-section.fade-ready {
+          opacity: 0;
+          transform: translateY(40px);
+        }
+        .fade-section.fade-ready.is-visible {
           opacity: 1;
           transform: translateY(0);
         }
